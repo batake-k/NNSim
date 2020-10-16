@@ -2,7 +2,7 @@ MODE:=Release
 #Release or Debug
 
 CXX=g++
-CXX_FLAGS=-Wall -std=c++11 -fopenmp
+CXX_FLAGS=-Wall -std=c++11 #-fopenmp
 
 ifeq ($(MODE),Release)
 	CXX_FLAGS += -O3

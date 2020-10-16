@@ -6,7 +6,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
-  DiscreteNeuron dn();
+  DiscreteNeuron dn;
   dn.status();
   cout << "get bias" << dn.getBias() << endl;
 }

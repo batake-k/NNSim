@@ -3,12 +3,12 @@
 
 class Neuron {
 public:
-  Neuron();
+  Neuron() {};
   Neuron(double _bias){
     bias = _bias;
   }
 
-  virtual ~Neuron();
+  virtual ~Neuron() {};
 
   double getBias(){
     return bias;

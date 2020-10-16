@@ -5,10 +5,9 @@
 
 using namespace std;
 
-DiscreteNeuron::DiscreteNeuron(){
+DiscreteNeuron::DiscreteNeuron() : Neuron(1.0){
   output = 1;
   output_old = 1;
-  Neuron(1.0);
 }
 
 void DiscreteNeuron::status(){
