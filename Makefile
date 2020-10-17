@@ -14,6 +14,7 @@ endif
 
 CPP_SRC=./src/main.cpp \
   ./src/discrete_neuron.cpp \
+  ./src/neural_network_model.cpp \
 
 OBJS =
 OBJS += $(C_SRC:%.c=%.o)
