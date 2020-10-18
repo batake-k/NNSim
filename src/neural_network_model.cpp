@@ -16,3 +16,7 @@ NeuralNetworkModel::NeuralNetworkModel(bool _sync, uint32_t num_neurons, std::st
   cout << "sync: " << sync << endl
        << "num neurons: " << neurons.size() << endl;
 }
+
+void NeuralNetworkModel::update(){
+  
+}

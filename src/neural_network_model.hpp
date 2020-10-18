@@ -19,6 +19,8 @@ public:
   NeuralNetworkModel(bool _sync, uint32_t num_neurons, std::string weights_file);
   virtual ~NeuralNetworkModel() {};
 
+  void update();
+
 private:
   bool sync;
   std::vector<std::shared_ptr<Neuron>> neurons;
