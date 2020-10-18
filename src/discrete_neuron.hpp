@@ -5,7 +5,7 @@
 
 class DiscreteNeuron : public Neuron {
 public:
-  DiscreteNeuron();
+  DiscreteNeuron(int bias);
 
   void update(){
     output_old = output;

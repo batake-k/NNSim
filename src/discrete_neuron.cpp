@@ -5,7 +5,7 @@
 
 using namespace std;
 
-DiscreteNeuron::DiscreteNeuron() : Neuron(1.0){
+DiscreteNeuron::DiscreteNeuron(int bias) : Neuron(bias){
   output = 1;
   output_old = 1;
 }
