@@ -1,6 +1,7 @@
 #include "neural_network_model.hpp"
 
 #include "discrete_neuron.hpp"
+#include "utils.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -25,7 +26,7 @@ namespace{
   }
 }
 
-NeuralNetworkModel::NeuralNetworkModel(bool _sync, uint32_t num_neurons, std::string weights_file, std::string bias_file):
+NeuralNetworkModel::NeuralNetworkModel(bool _sync, int num_neurons, std::string weights_file, std::string bias_file):
     sync(_sync){
 
   vector<int> bias = readBias(bias_file);
@@ -34,12 +35,24 @@ NeuralNetworkModel::NeuralNetworkModel(bool _sync, uint32_t num_neurons, std::st
     exit(1); 
   }
 
-  for(uint32_t i=0; i<num_neurons; ++i){
+  for(int i=0; i<num_neurons; ++i){
     neurons.emplace_back(std::make_shared<DiscreteNeuron>(bias[i]));
   }
 
-  cout << "sync: " << sync << endl
-       << "num neurons: " << neurons.size() << endl;
+  //TODO
+  weights.resize(num_neurons);
+  ifstream ifs(weights_file);
+
+  string line;
+  while(getline(ifs, line)){
+    vector<string> split_line = utils::split(line, ',');
+    Weight w = {stoi(split_line[0]), stoi(split_line[2])};
+    weights[stoi(split_line[1])].emplace_back(w);
+  }
+
+  for(int i=0; i<num_neurons; ++i){
+    cout << i << ", num weights: " << weights[i].size() << endl;
+  }
 }
 
 void NeuralNetworkModel::update(){
