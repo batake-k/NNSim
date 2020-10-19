@@ -9,27 +9,26 @@
 using namespace std;
 
 namespace{
-  vector<int> readBias(string bias_file){
+  vector<double> readBias(string bias_file){
     ifstream ifs(bias_file);
     if(ifs.fail()){
       cout << "[ERROR] file open error: " << bias_file << endl;
       exit(1);
     }
 
-    vector<int> bias;
+    vector<double> bias;
     string line;
     while(getline(ifs, line)){
-      bias.emplace_back(stoi(line));
+      bias.emplace_back(stod(line));
     }
 
     return bias;
   }
 }
 
-NeuralNetworkModel::NeuralNetworkModel(bool _sync, int num_neurons, std::string weights_file, std::string bias_file):
-    sync(_sync){
+NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file){
 
-  vector<int> bias = readBias(bias_file);
+  vector<double> bias = readBias(bias_file);
   if(num_neurons != bias.size()){
     cout << "[ERROR] wrong bias size, num of neurons: " << num_neurons << ", bias size: " << bias.size() << endl;
     exit(1); 
@@ -46,15 +45,11 @@ NeuralNetworkModel::NeuralNetworkModel(bool _sync, int num_neurons, std::string 
   string line;
   while(getline(ifs, line)){
     vector<string> split_line = utils::split(line, ',');
-    Weight w = {stoi(split_line[0]), stoi(split_line[2])};
+    Weight w = {stoi(split_line[0]), stod(split_line[2])};
     weights[stoi(split_line[1])].emplace_back(w);
   }
 
   for(int i=0; i<num_neurons; ++i){
     cout << i << ", num weights: " << weights[i].size() << endl;
   }
-}
-
-void NeuralNetworkModel::update(){
-  
 }

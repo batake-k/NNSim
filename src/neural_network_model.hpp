@@ -12,17 +12,16 @@ public:
 
   struct Weight {
     int neuron_id;
-    int weight;
+    double weight;
   };
 
   NeuralNetworkModel();
-  NeuralNetworkModel(bool _sync, int num_neurons, std::string weights_file, std::string bias_file);
+  NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file);
   virtual ~NeuralNetworkModel() {};
 
-  void update();
+  virtual void update() {};
 
 private:
-  bool sync;
   std::vector<std::shared_ptr<Neuron>> neurons;
   std::vector<std::vector<Weight>> weights;
 };

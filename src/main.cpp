@@ -1,6 +1,4 @@
-//TODO
-//#include "discrete_neuron.hpp"
-#include "neural_network_model.hpp"
+#include "mcculloch_pitts_model.hpp"
 
 #include <string>
 #include <iostream>
@@ -17,5 +15,5 @@ int main(int argc, char *argv[]){
   string weight_file = argv[2];
   string bias_file = argv[3];
 
-  NeuralNetworkModel nnm(true, num_neurons, weight_file, bias_file);
+  MccullochPittsModel mpm(true, num_neurons, weight_file, bias_file);
 }
