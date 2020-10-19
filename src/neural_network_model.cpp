@@ -1,10 +1,8 @@
 #include "neural_network_model.hpp"
 
-#include "discrete_neuron.hpp"
 #include "utils.hpp"
 
 #include <iostream>
-#include <fstream>
 
 using namespace std;
 
@@ -26,7 +24,9 @@ namespace{
   }
 }
 
-NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file){
+NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file, std::string output_file){
+
+  ofs.open(output_file, ios::out);
 
   vector<double> bias = readBias(bias_file);
   if(num_neurons != bias.size()){
@@ -35,7 +35,7 @@ NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file
   }
 
   for(int i=0; i<num_neurons; ++i){
-    neurons.emplace_back(std::make_shared<DiscreteNeuron>(bias[i]));
+    neurons.emplace_back(bias[i]);
   }
 
   //TODO
@@ -49,7 +49,18 @@ NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file
     weights[stoi(split_line[1])].emplace_back(w);
   }
 
-  for(int i=0; i<num_neurons; ++i){
-    cout << i << ", num weights: " << weights[i].size() << endl;
+  //random
+  mt  = mt19937(0);
+  rand_int = uniform_int_distribution<>(0, num_neurons -1);
+}
+
+void NeuralNetworkModel::output(int N){
+  for(int i=0; i<neurons.size(); ++i){
+    if(i % N == 0){
+      ofs << endl;
+    }
+
+    ofs << neurons[i].getOutput() << '\t';
   }
+  ofs << endl;
 }

@@ -4,17 +4,28 @@
 class Neuron {
 public:
   Neuron() {};
-  Neuron(double _bias){
-    bias = _bias;
+  Neuron(double _bias);
+  ~Neuron() {};
+
+  void update(){
+    output_old = output;
   }
 
-  virtual ~Neuron() {};
+  void setOutput(double value){
+    output = value;
+  }
+
+  double getOutput(){
+    return output_old;
+  }
 
   double getBias(){
     return bias;
   }
 
-protected:
+private:
+  double output;
+  double output_old;
   double bias;
 };
 

@@ -13,8 +13,8 @@ endif
 #C_SRC= \
 
 CPP_SRC=./src/main.cpp \
-  ./src/discrete_neuron.cpp \
-  ./src/mcculloch_pitts_model.cpp \
+  ./src/hopfield_model.cpp \
+  ./src/neuron.cpp \
   ./src/neural_network_model.cpp \
   ./src/utils.cpp \
 

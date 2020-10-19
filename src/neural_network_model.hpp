@@ -5,7 +5,8 @@
 
 #include <vector>
 #include <string>
-#include <memory>
+#include <fstream>
+#include <random>
 
 class NeuralNetworkModel {
 public:
@@ -16,14 +17,20 @@ public:
   };
 
   NeuralNetworkModel();
-  NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file);
+  NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file, std::string output_file);
   virtual ~NeuralNetworkModel() {};
 
   virtual void update() {};
+  void output(int N);
 
-private:
-  std::vector<std::shared_ptr<Neuron>> neurons;
+protected:
+  std::vector<Neuron> neurons;
   std::vector<std::vector<Weight>> weights;
+
+  std::mt19937 mt;
+  std::uniform_int_distribution<> rand_int;
+private:
+  std::ofstream ofs;
 };
 
 #endif
