@@ -5,8 +5,8 @@
 
 using namespace std;
 
-HopfieldModel::HopfieldModel(bool _sync, double _gain, int num_neurons, string weights_file, string bias_file, string output_file):
-    NeuralNetworkModel(num_neurons, weights_file, bias_file, output_file),sync(_sync),gain(_gain){
+HopfieldModel::HopfieldModel(bool _sync, double _gain, int num_neurons, string weights_file, string bias_file, string output_file, int seed):
+    NeuralNetworkModel(num_neurons, weights_file, bias_file, output_file, seed),sync(_sync),gain(_gain){
   
 }
 

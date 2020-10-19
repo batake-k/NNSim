@@ -7,7 +7,7 @@
 
 class HopfieldModel : public NeuralNetworkModel {
 public:
-  HopfieldModel(bool _sync, double _gain, int num_neurons, std::string weights_file, std::string bias_file, std::string output_file);
+  HopfieldModel(bool _sync, double _gain, int num_neurons, std::string weights_file, std::string bias_file, std::string output_file, int seed);
 
   void update();
   void updateSync();

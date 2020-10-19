@@ -6,8 +6,8 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
-  if(argc != 8){
-    cout << "./nnsim [num neurons] [weight file] [bias file] [output file] [gain] [times] [sync]" << endl;
+  if(argc != 9){
+    cout << "./nnsim [N] [weight file] [bias file] [output file] [gain] [times] [sync] [seed]" << endl;
     return 0;
   }
 
@@ -19,6 +19,7 @@ int main(int argc, char *argv[]){
   int times = stoi(argv[6]);
   int _sync = stoi(argv[7]);
   bool sync = true;
+  int seed = stoi(argv[8]);
 
   if(_sync == 0){
     sync = false;
@@ -28,12 +29,15 @@ int main(int argc, char *argv[]){
        << "gain: " << gain << endl
        << "times: " << times << endl;
 
-  HopfieldModel hm(sync, gain, num_neurons, weight_file, bias_file, output_file);
+  HopfieldModel hm(sync, gain, num_neurons * num_neurons, weight_file, bias_file, output_file, seed);
 
-  hm.output(5);
+  hm.calcE(num_neurons);
+  hm.output(num_neurons);
 
   for(int i = 0; i<times; ++i){
     hm.update();
-    hm.output(5);
+    hm.calcE(num_neurons);
+    hm.output(num_neurons);
   }
+
 }

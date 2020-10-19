@@ -17,11 +17,12 @@ public:
   };
 
   NeuralNetworkModel();
-  NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file, std::string output_file);
+  NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file, std::string output_file, int seed);
   virtual ~NeuralNetworkModel() {};
 
   virtual void update() {};
   void output(int N);
+  void calcE(int N);
 
 protected:
   std::vector<Neuron> neurons;
