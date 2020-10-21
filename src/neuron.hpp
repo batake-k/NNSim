@@ -4,7 +4,7 @@
 class Neuron {
 public:
   Neuron() {};
-  Neuron(double _bias);
+  Neuron(double _output, double _bias);
   ~Neuron() {};
 
   void update(){

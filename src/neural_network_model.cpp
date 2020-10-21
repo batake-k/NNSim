@@ -7,7 +7,7 @@
 using namespace std;
 
 namespace{
-  vector<double> readBias(string bias_file){
+  vector<double> readBias(const string& bias_file){
     ifstream ifs(bias_file);
     if(ifs.fail()){
       cout << "[ERROR] file open error: " << bias_file << endl;
@@ -24,18 +24,20 @@ namespace{
   }
 }
 
-NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file, std::string bias_file, std::string output_file, int seed){
+NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string& bias_file, const string& output_file, const int seed){
+
+  vector<double> bias = readBias(bias_file);
+  int num_neurons = bias.size();
+
+	//random
+	mt = mt19937(seed);
+	rand_int = uniform_int_distribution<>(0, num_neurons -1);
 
   ofs.open(output_file, ios::out);
 
-  vector<double> bias = readBias(bias_file);
-  if(num_neurons != bias.size()){
-    cout << "[ERROR] wrong bias size, num of neurons: " << num_neurons << ", bias size: " << bias.size() << endl;
-    exit(1); 
-  }
-
+	uniform_real_distribution<> rand_real(0.0, 1.0);
   for(int i=0; i<num_neurons; ++i){
-    neurons.emplace_back(Neuron(bias[i]));
+    neurons.emplace_back(Neuron(rand_real(mt), bias[i]));
   }
 
   //TODO
@@ -49,13 +51,10 @@ NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file
     weights[stoi(split_line[1])].emplace_back(w);
   }
 
-  //random
-  mt  = mt19937(seed);
-  rand_int = uniform_int_distribution<>(0, num_neurons -1);
 }
 
 void NeuralNetworkModel::output(int N){
-  for(int i=0; i<neurons.size(); ++i){
+  for(uint32_t i=0; i<neurons.size(); ++i){
     if(i % N == 0 && i != 0){
       ofs << endl;
     }

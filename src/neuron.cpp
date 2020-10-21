@@ -2,7 +2,6 @@
 
 using namespace std;
 
-Neuron::Neuron(double _bias): bias(_bias){
-  output = 1.0;
-  output_old = 1.0;
+Neuron::Neuron(double _output, double _bias): output(_output),output_old(_output),bias(_bias){
+  
 }

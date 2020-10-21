@@ -7,7 +7,7 @@
 using namespace std;
 
 namespace utils{
-  /*double Get_max_memory_consumption(){
+  double Get_max_memory_consumption(){
     char command[128];
     char field[51];
     FILE *p_file;
@@ -18,7 +18,6 @@ namespace utils{
     pclose(p_file);
     return std::atof(field)/(1024*1024);
   }
-*/
 
 	std::vector<std::string> split(const std::string &str, const char delim){
 		std::vector<std::string> elems;

@@ -12,7 +12,7 @@ namespace utils{
 	void WriteString(std::ofstream &ofs, const std::string &s);
 	std::string LoadString(std::ifstream &ifs);
 
-	//double Get_max_memory_consumption();
+	double Get_max_memory_consumption();
 	std::vector<std::string> split(const std::string &str, const char delim);
 
 	template<typename T>
