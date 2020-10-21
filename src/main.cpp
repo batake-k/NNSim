@@ -1,4 +1,5 @@
 #include "hopfield_model.hpp"
+#include "gaussian_model.hpp"
 
 #include <string>
 #include <iostream>
@@ -30,6 +31,7 @@ int main(int argc, char *argv[]){
        << "times: " << times << endl;
 
   HopfieldModel hm(sync, gain, num_neurons * num_neurons, weight_file, bias_file, output_file, seed);
+  //GaussianModel hm(sync, gain, num_neurons * num_neurons, weight_file, bias_file, output_file, seed);
 
   hm.calcE(num_neurons);
   hm.output(num_neurons);

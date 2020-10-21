@@ -2,7 +2,7 @@ MODE:=Release
 #Release or Debug
 
 CXX=g++
-CXX_FLAGS=-Wall -std=c++11 #-fopenmp
+CXX_FLAGS=-Wall -std=c++11 -fopenmp
 
 ifeq ($(MODE),Release)
 	CXX_FLAGS += -O3
@@ -13,6 +13,7 @@ endif
 #C_SRC= \
 
 CPP_SRC=./src/main.cpp \
+  ./src/gaussian_model.cpp \
   ./src/hopfield_model.cpp \
   ./src/neuron.cpp \
   ./src/neural_network_model.cpp \

@@ -35,7 +35,7 @@ NeuralNetworkModel::NeuralNetworkModel(int num_neurons, std::string weights_file
   }
 
   for(int i=0; i<num_neurons; ++i){
-    neurons.emplace_back(bias[i]);
+    neurons.emplace_back(Neuron(bias[i]));
   }
 
   //TODO
