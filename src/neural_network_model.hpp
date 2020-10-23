@@ -13,7 +13,7 @@ public:
 
   struct Weight {
     int neuron_id;
-    double weight;
+    float weight;
   };
 
   NeuralNetworkModel();

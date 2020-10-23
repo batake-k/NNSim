@@ -1,21 +1,18 @@
 #include "simulator.hpp"
 #include "gaussian_model.hpp"
 #include "hopfield_model.hpp"
+#include "timer.hpp"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <math.h>
-
 #include <memory>
-
-#include <omp.h>
 
 using namespace std;
 
 void Simulator::run(po::variables_map &vm){
-	double start, end;
-	start = omp_get_wtime();
+	Timer timer;
 
 	setParameters(vm);
 
@@ -27,9 +24,10 @@ void Simulator::run(po::variables_map &vm){
 		model = make_shared<GaussianModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.output_file, parameters.seed, parameters.standard_deviation);
 	}
 
-	end = omp_get_wtime();
-	cout << "initialize network model: " << end - start << " sec." << endl;
+	timer.elapsed("init network model", 1);
+	timer.restart();
 
+	//TODO
 	uint32_t num_neurons = model->getNumNeuron();
 	int N = (int)sqrt(num_neurons);
 	if(N * N != num_neurons){
@@ -38,13 +36,18 @@ void Simulator::run(po::variables_map &vm){
 	}
 
 	model->calcE(N);
-	model->output(N);
 
+	Timer timer2;
 	for(int i=0; i<parameters.generations; ++i){
+		timer2.restart();
 		model->update();
 		model->calcE(N);
-		model->output(N);
+		timer2.elapsed("update", 2);
 	}
+
+	model->output(N);
+
+	timer.elapsed("update neurons", 1);
 }
 
 void Simulator::setParameters(po::variables_map &vm){
@@ -53,12 +56,11 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.bias_file = vm["bias"].as<string>();
 
 	parameters.model = vm["network_model"].as<char>();
-
-	parameters.sync = vm["update_method"].as<bool>();
+	parameters.sync = vm["syncronize"].as<bool>();
 
 	parameters.seed = vm["random_seed"].as<int>();
 	parameters.generations = vm["generations"].as<int>();
 
-	parameters.potential = vm["base_potential"].as<double>();
-	parameters.standard_deviation = vm["standard_deviation"].as<double>();
+	parameters.potential = vm["base_potential"].as<float>();
+	parameters.standard_deviation = vm["standard_deviation"].as<float>();
 }

@@ -4,29 +4,29 @@
 class Neuron {
 public:
   Neuron() {};
-  Neuron(double _output, double _bias);
+  Neuron(float _output, float _bias);
   ~Neuron() {};
 
   void update(){
     output_old = output;
   }
 
-  void setOutput(double value){
+  void setOutput(float value){
     output = value;
   }
 
-  double getOutput(){
+  float getOutput(){
     return output_old;
   }
 
-  double getBias(){
+  float getBias(){
     return bias;
   }
 
 private:
-  double output;
-  double output_old;
-  double bias;
+  float output;
+  float output_old;
+  float bias;
 };
 
 #endif

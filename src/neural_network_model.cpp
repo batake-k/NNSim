@@ -1,23 +1,24 @@
 #include "neural_network_model.hpp"
 
 #include "utils.hpp"
+#include "timer.hpp"
 
 #include <iostream>
 
 using namespace std;
 
 namespace{
-  vector<double> readBias(const string& bias_file){
+  vector<float> readBias(const string& bias_file){
     ifstream ifs(bias_file);
     if(ifs.fail()){
       cout << "[ERROR] file open error: " << bias_file << endl;
       exit(1);
     }
 
-    vector<double> bias;
+    vector<float> bias;
     string line;
     while(getline(ifs, line)){
-      bias.emplace_back(stod(line));
+      bias.emplace_back(stof(line));
     }
 
     return bias;
@@ -26,7 +27,11 @@ namespace{
 
 NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string& bias_file, const string& output_file, const int seed){
 
-  vector<double> bias = readBias(bias_file);
+	Timer timer;
+
+  vector<float> bias = readBias(bias_file);
+	timer.elapsed("read bias file", 2);
+
   int num_neurons = bias.size();
 
 	//random
@@ -35,21 +40,25 @@ NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string&
 
   ofs.open(output_file, ios::out);
 
+	timer.restart();
 	uniform_real_distribution<> rand_real(0.0, 1.0);
   for(int i=0; i<num_neurons; ++i){
     neurons.emplace_back(Neuron(rand_real(mt), bias[i]));
   }
+	timer.elapsed("init neurons", 2);
 
   //TODO
+	timer.restart();
   weights.resize(num_neurons);
   ifstream ifs(weights_file);
 
   string line;
   while(getline(ifs, line)){
     vector<string> split_line = utils::split(line, ',');
-    Weight w = {stoi(split_line[0]), stod(split_line[2])};
+    Weight w = {stoi(split_line[0]), stof(split_line[2])};
     weights[stoi(split_line[1])].emplace_back(w);
   }
+	timer.elapsed("read weights file", 2);
 
 }
 
@@ -122,6 +131,5 @@ void NeuralNetworkModel::calcE(int N){
     }
   }
 
-  cout << "E: " << E << endl;
   ofs << "E: " << E << endl;
 }

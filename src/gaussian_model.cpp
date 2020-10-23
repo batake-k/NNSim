@@ -5,8 +5,8 @@
 
 using namespace std;
 
-GaussianModel::GaussianModel(const bool _sync, const double _potential, const string& weights_file, const string& bias_file,
-		const string& output_file, const int seed, const double standard_deviation):
+GaussianModel::GaussianModel(const bool _sync, const float _potential, const string& weights_file, const string& bias_file,
+		const string& output_file, const int seed, const float standard_deviation):
     NeuralNetworkModel(weights_file, bias_file, output_file, seed),sync(_sync),potential(_potential){
   rand_dist = normal_distribution<>(0.0, standard_deviation);
 }
@@ -15,7 +15,7 @@ void GaussianModel::updateSync(){
   for(uint32_t i=0; i<neurons.size(); ++i){
 
     //calc input sum
-    double input_sum = 0;
+    float input_sum = 0;
     for(const auto& w : weights[i]){
       input_sum += neurons[w.neuron_id].getOutput() * w.weight;
     }
@@ -23,7 +23,7 @@ void GaussianModel::updateSync(){
     input_sum += rand_dist(mt);
 
     //calc output
-    double output = func(input_sum);
+    float output = func(input_sum);
 
     //set output
     neurons[i].setOutput(output);
@@ -40,7 +40,7 @@ void GaussianModel::updateAsync(){
     int id = rand_int(mt);
 
     //calc input sum
-    double input_sum = 0;
+    float input_sum = 0;
     for(const auto& w : weights[id]){
       input_sum += neurons[w.neuron_id].getOutput() * w.weight;
     }
@@ -48,7 +48,7 @@ void GaussianModel::updateAsync(){
     input_sum += rand_dist(mt);
 
     //calc output
-    double output = func(input_sum);
+    float output = func(input_sum);
 
     //set output
     neurons[id].setOutput(output);
@@ -67,6 +67,6 @@ void GaussianModel::update(){
   }
 }
 
-double GaussianModel::func(double input_sum){
+float GaussianModel::func(float input_sum){
   return (std::tanh(input_sum / potential) + 1) / 2;
 }

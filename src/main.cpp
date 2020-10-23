@@ -1,11 +1,10 @@
 #include "simulator.hpp"
 #include "utils.hpp"
+#include "timer.hpp"
 
 #include <string>
 #include <iostream>
 #include <iomanip>
-
-#include <omp.h>
 
 using namespace std;
 
@@ -24,12 +23,12 @@ namespace {
 			("output,o", po::value<std::string>(), "output file");
 
 		opt_opt.add_options()
-			("network_model,m", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian) [g]")
-			("update_method,u", po::value<bool>()->default_value(0), "update method, 0(async) or 1(sync) [0]")
-      ("random_seed,r", po::value<int>()->default_value(0), "random seed [0]")
-      ("generations,g", po::value<int>()->default_value(100), "number of generations [100]")
-			("base_potential,B", po::value<double>()->default_value(0.01), "base potential [0.01]")
-			("standard_deviation,s", po::value<double>()->default_value(0.1), "standard deviation for gaussian noise [0.1]");
+			("network_model,m", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")
+			("syncronize,s", po::value<bool>()->default_value(0), "syncronously update neurons, 0(async) or 1(sync)")
+      ("random_seed,r", po::value<int>()->default_value(0), "random seed")
+      ("generations,g", po::value<int>()->default_value(100), "number of generations")
+			("base_potential,B", po::value<float>()->default_value(0.01), "base potential in tanh")
+			("standard_deviation,S", po::value<float>()->default_value(0.1), "standard deviation for gaussian noise");
 
 		opt.add(req_opt).add(opt_opt);
 		return opt;
@@ -51,16 +50,12 @@ namespace {
 
 int main(int argc, char *argv[]){
 
-	double start, end;
-	start = omp_get_wtime();
+	Timer timer;
 
 	po::options_description opt = DefineOption();
 	po::variables_map vm = CommandParse(argc, argv, opt);
 
 	if(!vm.count("output") || !vm.count("weights") || !vm.count("bias")){
-		cout << "output: " << vm.count("output") << endl
-				 << "weights: " << vm.count("weights") << endl
-				 << "bias: " << vm.count("bias") << endl;
 		cout << "usage: nnsim [<options>]" << endl
 				 << opt << endl;
 		exit(0);
@@ -69,8 +64,6 @@ int main(int argc, char *argv[]){
 	Simulator simulator;
 	simulator.run(vm);
 
-	end = omp_get_wtime();
-	cout << std::fixed << std::setprecision(2)
-			 << "real time: " << end - start <<  " sec." << endl;
-	cout << "peak memory usage: " << utils::Get_max_memory_consumption() << " GB" << endl;
+	timer.elapsed("real time", 0);
+	cout << "[peak memory usage] " << utils::Get_max_memory_consumption() << " GB" << endl;
 }

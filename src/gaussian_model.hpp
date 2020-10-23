@@ -7,19 +7,18 @@
 
 class GaussianModel : public NeuralNetworkModel {
 public:
-  GaussianModel(const bool _sync, const double _potential, const std::string& weights_file, const std::string& bias_file,
-			const std::string& output_file, const int seed, const double standard_deviation);
+  GaussianModel(const bool _sync, const float _potential, const std::string& weights_file, const std::string& bias_file,
+			const std::string& output_file, const int seed, const float standard_deviation);
 
   void update();
   void updateSync();
   void updateAsync();
 
 private:
+  float func(float input_sum);
+
   bool sync;
-  double potential;
-
-  double func(double input_sum);
-
+  float potential;
   std::normal_distribution<> rand_dist;
 };
 

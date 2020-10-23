@@ -19,8 +19,8 @@ public:
 		bool sync;
 		int seed;
 		int generations;
-		double potential;
-		double standard_deviation;
+		float potential;
+		float standard_deviation;
 	}Parameters;
 
 	Simulator(){};
