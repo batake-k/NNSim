@@ -6,8 +6,8 @@
 using namespace std;
 
 HopfieldModel::HopfieldModel(const bool _sync, const float _potential, const string& weights_file, const string& bias_file,
-		const string& output_file, const int seed): 
-		NeuralNetworkModel(weights_file, bias_file, output_file, seed),sync(_sync),potential(_potential){
+		const int seed): 
+		NeuralNetworkModel(weights_file, bias_file, seed),sync(_sync),potential(_potential){
   
 }
 

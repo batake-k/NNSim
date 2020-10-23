@@ -2,6 +2,7 @@
 #define SIMULATOR_HPP
 
 #include <string>
+#include <fstream>
 
 #include <boost/program_options.hpp>
 
@@ -30,6 +31,8 @@ public:
 
 private:
 	Parameters parameters;
+	std::ofstream ofs;
+
 	void setParameters(po::variables_map &vm);
 };
 

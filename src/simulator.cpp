@@ -16,12 +16,18 @@ void Simulator::run(po::variables_map &vm){
 
 	setParameters(vm);
 
+	ofs.open(parameters.output_file);
+	if((ofs.fail())){
+		cout << "[ERROR] file open error: " << parameters.output_file << endl;
+		exit(1);
+	}
+
 	std::shared_ptr<NeuralNetworkModel> model;
 
 	if(parameters.model == 'h'){
-		model = make_shared<HopfieldModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.output_file, parameters.seed);
+		model = make_shared<HopfieldModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed);
 	}else{
-		model = make_shared<GaussianModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.output_file, parameters.seed, parameters.standard_deviation);
+		model = make_shared<GaussianModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed, parameters.standard_deviation);
 	}
 
 	timer.elapsed("init network model", 1);
@@ -29,23 +35,23 @@ void Simulator::run(po::variables_map &vm){
 
 	//TODO
 	uint32_t num_neurons = model->getNumNeuron();
-	int N = (int)sqrt(num_neurons);
+	uint32_t N = (uint32_t)sqrt(num_neurons);
 	if(N * N != num_neurons){
 		cout << "N^2: " << N*N << ", num neurons: " << num_neurons << endl;
 		exit(0);
 	}
 
-	model->calcE(N);
+	ofs << model->calcE(N) << endl;
 
 	Timer timer2;
 	for(int i=0; i<parameters.generations; ++i){
 		timer2.restart();
 		model->update();
-		model->calcE(N);
+		ofs << model->calcE(N) << endl;
 		timer2.elapsed("update", 2);
 	}
 
-	model->output(N);
+	ofs << model->output(N) << endl;
 
 	timer.elapsed("update neurons", 1);
 }

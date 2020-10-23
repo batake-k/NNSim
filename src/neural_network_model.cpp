@@ -25,7 +25,7 @@ namespace{
   }
 }
 
-NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string& bias_file, const string& output_file, const int seed){
+NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string& bias_file, const int seed){
 
 	Timer timer;
 
@@ -37,8 +37,6 @@ NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string&
 	//random
 	mt = mt19937(seed);
 	rand_int = uniform_int_distribution<>(0, num_neurons -1);
-
-  ofs.open(output_file, ios::out);
 
 	timer.restart();
 	uniform_real_distribution<> rand_real(0.0, 1.0);
@@ -62,18 +60,20 @@ NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string&
 
 }
 
-void NeuralNetworkModel::output(int N){
+string NeuralNetworkModel::output(int N){
+	string output = "";
   for(uint32_t i=0; i<neurons.size(); ++i){
     if(i % N == 0 && i != 0){
-      ofs << endl;
+      output += "\n";
     }
 
-    ofs << neurons[i].getOutput() << '\t';
+		output += to_string(neurons[i].getOutput()) + ",";
   }
-  ofs << endl << endl;
+  output += "\n";
+	return output;
 }
 
-void NeuralNetworkModel::calcE(int N){
+double NeuralNetworkModel::calcE(int N){
 
   double E = 0;
 
@@ -131,5 +131,5 @@ void NeuralNetworkModel::calcE(int N){
     }
   }
 
-  ofs << "E: " << E << endl;
+  return E;
 }

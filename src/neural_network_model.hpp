@@ -17,7 +17,7 @@ public:
   };
 
   NeuralNetworkModel();
-  NeuralNetworkModel(const std::string& weights_file, const std::string& bias_file, const std::string& output_file, const int seed);
+  NeuralNetworkModel(const std::string& weights_file, const std::string& bias_file, const int seed);
   virtual ~NeuralNetworkModel() {};
 
   virtual void update() {};
@@ -26,8 +26,8 @@ public:
 		return neurons.size();
 	}
 
-  void output(int N);
-  void calcE(int N);
+  std::string output(int N);
+  double calcE(int N);
 
 protected:
   std::vector<Neuron> neurons;
@@ -36,7 +36,6 @@ protected:
   std::mt19937 mt;
   std::uniform_int_distribution<> rand_int;
 private:
-  std::ofstream ofs;
 };
 
 #endif

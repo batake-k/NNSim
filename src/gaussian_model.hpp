@@ -8,7 +8,7 @@
 class GaussianModel : public NeuralNetworkModel {
 public:
   GaussianModel(const bool _sync, const float _potential, const std::string& weights_file, const std::string& bias_file,
-			const std::string& output_file, const int seed, const float standard_deviation);
+			const int seed, const float standard_deviation);
 
   void update();
   void updateSync();
