@@ -7,24 +7,19 @@
 
 using namespace std;
 
-namespace{
-  vector<float> readBias(const string& bias_file){
-    ifstream ifs(bias_file, ios::binary);
-    if(ifs.fail()){
-      cout << "[ERROR] file open error: " << bias_file << endl;
-      exit(0);
-    }
-
-		uint32_t size;
-		ifs.read((char*)&size, sizeof(uint32_t));
-    vector<float> bias(size);
-
-		ifs.read((char*)&bias[0], sizeof(float)*size);
-
-		ifs.close();
-
-    return bias;
+void NeuralNetworkModel::readBias(const string& bias_file){
+  ifstream ifs(bias_file, ios::binary);
+  if(ifs.fail()){
+    cout << "[ERROR] file open error: " << bias_file << endl;
+    exit(0);
   }
+
+	uint32_t size;
+	ifs.read((char*)&size, sizeof(uint32_t));
+  bias.resize(size);
+
+	ifs.read((char*)&bias[0], sizeof(float)*size);
+	ifs.close();
 }
 
 void NeuralNetworkModel::readWeights(const string& weights_file){
@@ -47,11 +42,12 @@ void NeuralNetworkModel::readWeights(const string& weights_file){
 	ifs.close();
 }
 
-NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string& bias_file, const int seed){
+NeuralNetworkModel::NeuralNetworkModel(const float _potential, const string& weights_file, const string& bias_file, const int seed,
+		 const int _time_constant): potential(_potential){
 
 	Timer timer;
 
-  vector<float> bias = readBias(bias_file);
+  readBias(bias_file);
 	timer.elapsed("read bias file", 2);
 
   int num_neurons = bias.size();
@@ -60,10 +56,16 @@ NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string&
 	mt = mt19937(seed);
 	rand_int = uniform_int_distribution<>(0, num_neurons -1);
 
+	if(_time_constant < 1){
+		cout << "[ERROR] time constant should > 1" << endl;
+	}
+	time_constant_for_multi = (_time_constant -1) / _time_constant;
+
 	timer.restart();
 	uniform_real_distribution<> rand_real(0.0, 1.0);
   for(int i=0; i<num_neurons; ++i){
-    neurons.emplace_back(Neuron(rand_real(mt), bias[i]));
+		float potential = rand_real(mt);
+    neurons.emplace_back(Neuron(func(potential), potential));
   }
 	timer.elapsed("init neurons", 2);
 
@@ -146,4 +148,8 @@ double NeuralNetworkModel::calcE(int N){
   }
 
   return E;
+}
+
+float NeuralNetworkModel::func(float input_sum){
+	return (std::tanh(input_sum / potential) + 1) / 2;
 }

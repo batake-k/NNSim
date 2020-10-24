@@ -4,7 +4,7 @@
 class Neuron {
 public:
   Neuron() {};
-  Neuron(float _output, float _bias);
+  Neuron(float _output, float _potential);
   ~Neuron() {};
 
   void update(){
@@ -19,14 +19,18 @@ public:
     return output_old;
   }
 
-  float getBias(){
-    return bias;
-  }
+	float getPotential(){
+		return potential;
+	}
+
+	void setPotential(float value){
+		potential = value;
+	}
 
 private:
   float output;
   float output_old;
-  float bias;
+	float potential;
 };
 
 #endif

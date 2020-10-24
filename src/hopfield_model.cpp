@@ -6,8 +6,8 @@
 using namespace std;
 
 HopfieldModel::HopfieldModel(const bool _sync, const float _potential, const string& weights_file, const string& bias_file,
-		const int seed): 
-		NeuralNetworkModel(weights_file, bias_file, seed),sync(_sync),potential(_potential){
+		const int seed, const int time_constant): 
+		NeuralNetworkModel(_potential, weights_file, bias_file, seed, time_constant),sync(_sync){
   
 }
 
@@ -19,10 +19,13 @@ void HopfieldModel::updateSync(){
     for(const auto& w : weights[i]){
       input_sum += neurons[w.neuron_id].getOutput() * w.weight;
     }
-    input_sum += neurons[i].getBias();
+    input_sum += bias[i];
+
+		float p = neurons[i].getPotential() * time_constant_for_multi + input_sum;
+		neurons[i].setPotential(p);
 
     //calc output
-    float output = func(input_sum);
+    float output = func(p);
 
     //set output
     neurons[i].setOutput(output);
@@ -43,10 +46,13 @@ void HopfieldModel::updateAsync(){
     for(const auto& w : weights[id]){
       input_sum += neurons[w.neuron_id].getOutput() * w.weight;
     }
-    input_sum += neurons[id].getBias();
+    input_sum += bias[id];
+
+		float p = neurons[id].getPotential() * time_constant_for_multi + input_sum;
+		neurons[id].setPotential(p);
 
     //calc output
-    float output = func(input_sum);
+    float output = func(p);
 
     //set output
     neurons[id].setOutput(output);
@@ -63,8 +69,4 @@ void HopfieldModel::update(){
   }else{
     updateAsync();
   }
-}
-
-float HopfieldModel::func(float input_sum){
-	return (std::tanh(input_sum / potential) + 1) / 2;
 }

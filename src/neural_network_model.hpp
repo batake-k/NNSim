@@ -17,7 +17,7 @@ public:
   };
 
   NeuralNetworkModel();
-  NeuralNetworkModel(const std::string& weights_file, const std::string& bias_file, const int seed);
+  NeuralNetworkModel(const float _potential, const std::string& weights_file, const std::string& bias_file, const int seed, const int _time_constant);
   virtual ~NeuralNetworkModel() {};
 
   virtual void update() {};
@@ -30,13 +30,20 @@ public:
   double calcE(int N);
 
 protected:
+	float func(float input_sum);
+
   std::vector<Neuron> neurons;
   std::vector<std::vector<Weight>> weights;
+	std::vector<float> bias;
 
   std::mt19937 mt;
   std::uniform_int_distribution<> rand_int;
+	float time_constant_for_multi;
 private:
 	void readWeights(const std::string& weights_file);
+	void readBias(const std::string& bias_file);
+
+	float potential;
 };
 
 #endif

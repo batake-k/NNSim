@@ -27,8 +27,9 @@ namespace {
 			("syncronize,s", po::value<bool>()->default_value(0), "syncronously update neurons, 0(async) or 1(sync)")
       ("random_seed,r", po::value<int>()->default_value(0), "random seed")
       ("generations,g", po::value<int>()->default_value(100), "number of generations")
+			("time_constant,t", po::value<int>()->default_value(100), "time constant")
 			("base_potential,B", po::value<float>()->default_value(0.01), "base potential in tanh")
-			("standard_deviation,S", po::value<float>()->default_value(0.1), "standard deviation for gaussian noise");
+			("standard_deviation,S", po::value<float>()->default_value(0.1), "standard deviation for noise");
 
 		opt.add(req_opt).add(opt_opt);
 		return opt;

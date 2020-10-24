@@ -25,9 +25,9 @@ void Simulator::run(po::variables_map &vm){
 	std::shared_ptr<NeuralNetworkModel> model;
 
 	if(parameters.model == 'h'){
-		model = make_shared<HopfieldModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed);
+		model = make_shared<HopfieldModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed, parameters.time_constant);
 	}else{
-		model = make_shared<GaussianModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed, parameters.standard_deviation);
+		model = make_shared<GaussianModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed, parameters.time_constant, parameters.standard_deviation);
 	}
 
 	timer.elapsed("init network model", 1);
@@ -66,6 +66,7 @@ void Simulator::setParameters(po::variables_map &vm){
 
 	parameters.seed = vm["random_seed"].as<int>();
 	parameters.generations = vm["generations"].as<int>();
+	parameters.time_constant = vm["time_constant"].as<int>();
 
 	parameters.potential = vm["base_potential"].as<float>();
 	parameters.standard_deviation = vm["standard_deviation"].as<float>();

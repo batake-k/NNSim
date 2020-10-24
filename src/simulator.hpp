@@ -20,6 +20,7 @@ public:
 		bool sync;
 		int seed;
 		int generations;
+		int time_constant;
 		float potential;
 		float standard_deviation;
 	}Parameters;

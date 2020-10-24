@@ -2,6 +2,6 @@
 
 using namespace std;
 
-Neuron::Neuron(float _output, float _bias): output(_output),output_old(_output),bias(_bias){
+Neuron::Neuron(float _output, float _potential): output(_output),output_old(_output),potential(_potential){
   
 }
