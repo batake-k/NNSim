@@ -17,11 +17,10 @@ public:
 		std::string bias_file;
 
 		char model;
-		bool sync;
 		int seed;
 		int generations;
 		int time_constant;
-		float potential;
+		float base_potential;
 		float standard_deviation;
 	}Parameters;
 

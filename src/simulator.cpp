@@ -13,7 +13,6 @@ using namespace std;
 
 void Simulator::run(po::variables_map &vm){
 	Timer timer;
-
 	setParameters(vm);
 
 	ofs.open(parameters.output_file);
@@ -23,15 +22,12 @@ void Simulator::run(po::variables_map &vm){
 	}
 
 	std::shared_ptr<NeuralNetworkModel> model;
-
 	if(parameters.model == 'h'){
-		model = make_shared<HopfieldModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed, parameters.time_constant);
+		model = make_shared<HopfieldModel>(parameters.weights_file, parameters.bias_file, parameters.seed, parameters.time_constant, parameters.base_potential);
 	}else{
-		model = make_shared<GaussianModel>(parameters.sync, parameters.potential, parameters.weights_file, parameters.bias_file, parameters.seed, parameters.time_constant, parameters.standard_deviation);
+		model = make_shared<GaussianModel>(parameters.weights_file, parameters.bias_file, parameters.seed, parameters.time_constant, parameters.base_potential, parameters.standard_deviation);
 	}
-
 	timer.elapsed("init network model", 1);
-	timer.restart();
 
 	//TODO
 	uint32_t num_neurons = model->getNumNeuron();
@@ -41,13 +37,14 @@ void Simulator::run(po::variables_map &vm){
 		exit(0);
 	}
 
-	ofs << model->calcE(N) << endl;
+	timer.restart();
+	//ofs << model->calcE(N) << endl;
 
 	Timer timer2;
 	for(int i=0; i<parameters.generations; ++i){
 		timer2.restart();
 		model->update();
-		ofs << model->calcE(N) << endl;
+		//ofs << model->calcE(N) << endl;
 		timer2.elapsed("update", 2);
 	}
 
@@ -62,12 +59,9 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.bias_file = vm["bias"].as<string>();
 
 	parameters.model = vm["network_model"].as<char>();
-	parameters.sync = vm["syncronize"].as<bool>();
-
 	parameters.seed = vm["random_seed"].as<int>();
 	parameters.generations = vm["generations"].as<int>();
 	parameters.time_constant = vm["time_constant"].as<int>();
-
-	parameters.potential = vm["base_potential"].as<float>();
+	parameters.base_potential = vm["base_potential"].as<float>();
 	parameters.standard_deviation = vm["standard_deviation"].as<float>();
 }

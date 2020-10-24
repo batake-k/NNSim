@@ -24,7 +24,7 @@ namespace {
 
 		opt_opt.add_options()
 			("network_model,m", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")
-			("syncronize,s", po::value<bool>()->default_value(0), "syncronously update neurons, 0(async) or 1(sync)")
+			//("syncronize,s", po::value<bool>()->default_value(0), "syncronously update neurons, 0(async) or 1(sync)")
       ("random_seed,r", po::value<int>()->default_value(0), "random seed")
       ("generations,g", po::value<int>()->default_value(100), "number of generations")
 			("time_constant,t", po::value<int>()->default_value(100), "time constant")
