@@ -9,20 +9,42 @@ using namespace std;
 
 namespace{
   vector<float> readBias(const string& bias_file){
-    ifstream ifs(bias_file);
+    ifstream ifs(bias_file, ios::binary);
     if(ifs.fail()){
       cout << "[ERROR] file open error: " << bias_file << endl;
-      exit(1);
+      exit(0);
     }
 
-    vector<float> bias;
-    string line;
-    while(getline(ifs, line)){
-      bias.emplace_back(stof(line));
-    }
+		uint32_t size;
+		ifs.read((char*)&size, sizeof(uint32_t));
+    vector<float> bias(size);
+
+		ifs.read((char*)&bias[0], sizeof(float)*size);
+
+		ifs.close();
 
     return bias;
   }
+}
+
+void NeuralNetworkModel::readWeights(const string& weights_file){
+	ifstream ifs(weights_file, ios::binary);
+	if(ifs.fail()){
+		cout << "[ERROR] file open error: " << weights_file << endl;
+		exit(0);
+	}
+
+	uint32_t neuron_size, size;
+	ifs.read((char*)&neuron_size, sizeof(uint32_t));
+	weights.resize(neuron_size);
+
+	for(uint32_t i=0; i<neuron_size; ++i){
+		ifs.read((char*)&size, sizeof(uint32_t));
+		weights[i].resize(size);
+		ifs.read((char*)&weights[i][0], sizeof(Weight)*size);
+	}
+
+	ifs.close();
 }
 
 NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string& bias_file, const int seed){
@@ -47,15 +69,7 @@ NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string&
 
   //TODO
 	timer.restart();
-  weights.resize(num_neurons);
-  ifstream ifs(weights_file);
-
-  string line;
-  while(getline(ifs, line)){
-    vector<string> split_line = utils::split(line, ',');
-    Weight w = {stoi(split_line[0]), stof(split_line[2])};
-    weights[stoi(split_line[1])].emplace_back(w);
-  }
+	readWeights(weights_file);
 	timer.elapsed("read weights file", 2);
 
 }

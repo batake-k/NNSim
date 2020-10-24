@@ -36,6 +36,7 @@ protected:
   std::mt19937 mt;
   std::uniform_int_distribution<> rand_int;
 private:
+	void readWeights(const std::string& weights_file);
 };
 
 #endif
