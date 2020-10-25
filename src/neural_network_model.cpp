@@ -74,10 +74,11 @@ NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string&
 	timer.elapsed("init neurons", 2);
 
 	//calc time_constant_for_multi for update neuron_potentials
-	if(time_constant < 1){
+	if(time_constant <= 1){
 		cout << "[ERROR] time constant should > 1" << endl;
+		exit(0);
 	}
-	time_constant_for_multi = (time_constant -1) / time_constant;
+	time_constant_for_multi = (float)(time_constant -1) / time_constant;
 }
 
 string NeuralNetworkModel::output(int N){

@@ -18,7 +18,7 @@ public:
   NeuralNetworkModel(const std::string& weights_file, const std::string& bias_file, const int seed, const int time_constant, const float _base_potential);
   virtual ~NeuralNetworkModel() {};
 
-  virtual void update() {};
+  virtual void update(const bool internal_potential) {};
 
 	uint32_t getNumNeuron(){
 		return num_neurons;

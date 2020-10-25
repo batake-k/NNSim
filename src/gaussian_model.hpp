@@ -10,7 +10,7 @@ public:
   GaussianModel(const std::string& weights_file, const std::string& bias_file,
 			const int seed, const int time_constant, const float base_potential, const float standard_deviation);
 
-  void update();
+  void update(const bool internal_potential);
 
 private:
   std::normal_distribution<> rand_dist;

@@ -38,17 +38,17 @@ void Simulator::run(po::variables_map &vm){
 	}
 
 	timer.restart();
-	//ofs << model->calcE(N) << endl;
+	ofs << model->calcE(N) << endl;
 
 	Timer timer2;
 	for(int i=0; i<parameters.generations; ++i){
 		timer2.restart();
-		model->update();
-		//ofs << model->calcE(N) << endl;
+		model->update(parameters.internal_potential);
+		ofs << model->calcE(N) << endl;
 		timer2.elapsed("update", 2);
 	}
 
-	ofs << model->output(N) << endl;
+	//ofs << model->output(N) << endl;
 
 	timer.elapsed("update neurons", 1);
 }
@@ -59,6 +59,7 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.bias_file = vm["bias"].as<string>();
 
 	parameters.model = vm["network_model"].as<char>();
+	parameters.internal_potential = vm["internal_potential"].as<bool>();
 	parameters.seed = vm["random_seed"].as<int>();
 	parameters.generations = vm["generations"].as<int>();
 	parameters.time_constant = vm["time_constant"].as<int>();

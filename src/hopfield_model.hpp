@@ -10,7 +10,7 @@ public:
   HopfieldModel(const std::string& weights_file, const std::string& bias_file,
 			const int seed, const int time_constant, const float base_potential);
 
-  void update();
+  void update(const bool internal_potential);
 
 private:
 };

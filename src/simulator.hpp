@@ -17,6 +17,7 @@ public:
 		std::string bias_file;
 
 		char model;
+		bool internal_potential;
 		int seed;
 		int generations;
 		int time_constant;
