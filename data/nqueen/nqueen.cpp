@@ -4,14 +4,15 @@
 
 using namespace std;
 
-int N, A, B, C, D;
+uint32_t N;
+int A, B, C, D;
 
 typedef struct{
-	int neuron_id;
+	uint32_t neuron_id;
 	float weight;
 } W;
 
-int KDelta(int a, int b){
+int KDelta(uint32_t a, uint32_t b){
   if (a == b){
     return 1;
   }else{
@@ -19,7 +20,7 @@ int KDelta(int a, int b){
   }
 }
 
-int Weight(int x, int y, int X, int Y){
+int Weight(uint32_t x, uint32_t y, uint32_t X, uint32_t Y){
   int w = - A * KDelta(x, X) * (1 - KDelta(y, Y));
   w += - B * KDelta(y, Y) * (1 - KDelta(x, X));
   w += - C * KDelta(x + y, X + Y) * (1 - KDelta(x, X));
@@ -58,8 +59,8 @@ int main(int argc, char *argv[]){
 	uint32_t size = N * N;
 
 	vector<float> v_bias;
-  for(int x=0; x<N; ++x){
-    for(int y=0; y<N; ++y){
+  for(uint32_t x=0; x<N; ++x){
+    for(uint32_t y=0; y<N; ++y){
       v_bias.emplace_back((float)Bias());
     }
   }
@@ -69,13 +70,13 @@ int main(int argc, char *argv[]){
 
 
 	wofs.write((char*)&size, sizeof(uint32_t));
-  for(int x=0; x<N; ++x){
-    for(int y=0; y<N; ++y){
+  for(uint32_t x=0; x<N; ++x){
+    for(uint32_t y=0; y<N; ++y){
 
 			vector<W> v_W;
 
-      for(int X=0; X<N; ++X){
-        for(int Y=0; Y<N; ++Y){
+      for(uint32_t X=0; X<N; ++X){
+        for(uint32_t Y=0; Y<N; ++Y){
           float weight = (float)Weight(x, y, X, Y);
           if(weight != 0){
 						W w = {N*X+Y, weight};
