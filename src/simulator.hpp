@@ -14,13 +14,15 @@ public:
 	typedef struct {
 		std::string output_file;
 		std::string weights_file;
-		std::string bias_file;
+		std::string biases_file;
 
 		char model;
-		bool internal_potential;
-		int seed;
-		int generations;
-		int time_constant;
+		bool synchronize;
+		bool inner_potential;
+		uint32_t seed;
+		uint32_t generations;
+		uint32_t time_constant;
+		float delta_t;
 		float base_potential;
 		float standard_deviation;
 	}Parameters;
@@ -32,7 +34,6 @@ public:
 
 private:
 	Parameters parameters;
-	std::ofstream ofs;
 
 	void setParameters(po::variables_map &vm);
 };

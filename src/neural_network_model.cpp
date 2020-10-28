@@ -7,101 +7,97 @@
 
 using namespace std;
 
-void NeuralNetworkModel::readBias(const string& bias_file){
-  ifstream ifs(bias_file, ios::binary);
-  if(ifs.fail()){
-    cout << "[ERROR] file open error: " << bias_file << endl;
-    exit(0);
-  }
+void NeuralNetworkModel::readBiases(){
+	ifstream ifs;
+	utils::fileOpen(ifs, parameters.biases_file, ios::binary);
 
 	uint32_t size;
 	ifs.read((char*)&size, sizeof(uint32_t));
-  neuron_bias.resize(size);
+  biases.resize(size);
 
-	ifs.read((char*)&neuron_bias[0], sizeof(float)*size);
+	ifs.read((char*)&biases[0], sizeof(float)*size);
 	ifs.close();
 }
 
-void NeuralNetworkModel::readWeights(const string& weights_file){
-	ifstream ifs(weights_file, ios::binary);
-	if(ifs.fail()){
-		cout << "[ERROR] file open error: " << weights_file << endl;
-		exit(0);
-	}
+void NeuralNetworkModel::readWeights(){
+	ifstream ifs;
+	utils::fileOpen(ifs, parameters.weights_file, ios::binary);
 
 	uint32_t neuron_size, size;
 	ifs.read((char*)&neuron_size, sizeof(uint32_t));
-	neuron_weights.resize(neuron_size);
+	weights.resize(neuron_size);
 
 	for(uint32_t i=0; i<neuron_size; ++i){
 		ifs.read((char*)&size, sizeof(uint32_t));
-		neuron_weights[i].resize(size);
-		ifs.read((char*)&neuron_weights[i][0], sizeof(Weight)*size);
+		weights[i].resize(size);
+		ifs.read((char*)&weights[i][0], sizeof(Weight)*size);
 	}
 
 	ifs.close();
 }
 
-NeuralNetworkModel::NeuralNetworkModel(const string& weights_file, const string& bias_file, const int seed,
-		 const int time_constant, const float _base_potential): base_potential(_base_potential){
+NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters(_parameters){
 
-	//read bias file, and init neuron_bias
+	//read bias file, and init biases
 	Timer timer;
-  readBias(bias_file);
-	timer.elapsed("read bias file", 2);
+  readBiases();
+	timer.elapsed("read biases file", 2);
 
-  //read weights file, and init neuron_weights
+  //read weights file, and init weights
 	timer.restart();
-	readWeights(weights_file);
+	readWeights();
 	timer.elapsed("read weights file", 2);
 
-	num_neurons = neuron_bias.size();
+	utils::fileOpen(ofs, parameters.output_file, ios::out);
+
+	num_neurons = biases.size();
 
 	//set mt and rand_int for select random neuron
-	mt = mt19937(seed);
+	mt = mt19937(parameters.seed);
 	rand_int = uniform_int_distribution<>(0, num_neurons -1);
 
-	//init neuron_potentials, neuron_outputs
+	//calc reciprocal_time_constant and reciprocal_base_potential for update potentials
+	reciprocal_base_potential = 1.0 / parameters.base_potential;
+	reciprocal_time_constant = 1.0 / parameters.time_constant;
+
+	//init potentials, neuron_outputs
 	timer.restart();
-	neuron_potentials.resize(num_neurons);
-	neuron_outputs.resize(num_neurons);
+	potentials.resize(num_neurons);
+	outputs.resize(num_neurons);
+	outputs_old.resize(num_neurons);
 
 	uniform_real_distribution<> rand_real(0.0, 1.0);
   for(uint32_t i=0; i<num_neurons; ++i){
-		neuron_potentials[i] = rand_real(mt);
-    neuron_outputs[i] = func(neuron_potentials[i]);
+		outputs[i] = 0.5 + 0.001 * rand_real(mt);
+		outputs_old[i] = outputs[i];
+		potentials[i] = inverseFunc(outputs[i]);
   }
 	timer.elapsed("init neurons", 2);
-
-	//calc time_constant_for_multi for update neuron_potentials
-	if(time_constant <= 1){
-		cout << "[ERROR] time constant should > 1" << endl;
-		exit(0);
-	}
-	time_constant_for_multi = (float)(time_constant -1) / time_constant;
 }
 
-string NeuralNetworkModel::output(int N){
-	string output = "";
+
+void NeuralNetworkModel::output(){
+	int N = sqrt(num_neurons);
+
   for(uint32_t i=0; i<num_neurons; ++i){
     if(i % N == 0 && i != 0){
-      output += "\n";
+      ofs << endl;
     }
 
-		output += to_string(neuron_outputs[i]) + ",";
+		ofs << outputs[i] << ",";
   }
-  output += "\n";
-	return output;
+  ofs << endl;
 }
 
-double NeuralNetworkModel::calcE(int N){
+void NeuralNetworkModel::calcEnergyNQueen(){
 
+	int N = sqrt(num_neurons);
   double E = 0;
 
   for(int x=0; x<N; ++x){
     double a = 0;
     for(int y=0; y<N; ++y){
-      a += neuron_outputs[x * N + y];
+      a += outputs[x * N + y];
     }
     E += (a - 1) * (a - 1);
   }
@@ -109,7 +105,7 @@ double NeuralNetworkModel::calcE(int N){
   for(int y=0; y<N; ++y){
     double b = 0;
     for(int x=0; x<N; ++x){
-      b += neuron_outputs[x * N + y];
+      b += outputs[x * N + y];
     }
     E += (b - 1) * (b - 1);
   }
@@ -128,7 +124,7 @@ double NeuralNetworkModel::calcE(int N){
         if(Y < 0 || Y >= N || x == X){
           continue;
         }
-        E += neuron_outputs[x * N + y] * neuron_outputs[X * N + Y];
+        E += outputs[x * N + y] * outputs[X * N + Y];
       }
     }
   }
@@ -147,14 +143,21 @@ double NeuralNetworkModel::calcE(int N){
         if(Y < 0 || Y >= N || x == X){
           continue;
         }
-        E += neuron_outputs[x * N + y] * neuron_outputs[X * N + Y];
+        E += outputs[x * N + y] * outputs[X * N + Y];
       }
     }
   }
 
-  return E;
+  ofs << "E: " << E << endl;
 }
 
+//logit
+float NeuralNetworkModel::inverseFunc(const float input){
+	return log(input / (1.0 - input)) / reciprocal_base_potential;
+}
+
+//sigmoid
 float NeuralNetworkModel::func(const float input){
-	return (std::tanh(input / base_potential) + 1) / 2;
+	//return (std::tanh(input / base_potential) + 1) / 2;
+	return 1.0 / (1.0 + exp(- input * reciprocal_base_potential));
 }

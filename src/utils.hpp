@@ -9,14 +9,14 @@
 #include <cstring>
 
 namespace utils{
-	void WriteString(std::ofstream &ofs, const std::string &s);
-	std::string LoadString(std::ifstream &ifs);
+	//void WriteString(std::ofstream &ofs, const std::string &s);
+	//std::string LoadString(std::ifstream &ifs);
 
-	double Get_max_memory_consumption();
+	double getMaxMemoryConsumption();
 	std::vector<std::string> split(const std::string &str, const char delim);
 
 	template<typename T>
-	void FileOpen(T& fs, const std::string& filepath, const std::ios_base::openmode mode){
+	void fileOpen(T& fs, const std::string& filepath, const std::ios_base::openmode mode){
 		fs.open(filepath, mode);
 		if(fs.fail()){
 			std::cerr << "[ERROR] file open " << filepath << ": " << std::strerror(errno) << std::endl;

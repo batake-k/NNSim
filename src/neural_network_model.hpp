@@ -9,43 +9,57 @@
 class NeuralNetworkModel {
 public:
 
-  struct Weight {
-    int neuron_id;
-    float weight;
-  };
+	typedef struct {
+		std::string weights_file;
+		std::string biases_file;
+		std::string output_file;
 
-  NeuralNetworkModel();
-  NeuralNetworkModel(const std::string& weights_file, const std::string& bias_file, const int seed, const int time_constant, const float _base_potential);
+		bool synchronize;
+		bool inner_potential;
+		uint32_t seed;
+		uint32_t generations;
+		uint32_t time_constant;
+		float delta_t;
+		float base_potential;
+	}Parameters;
+
+  typedef struct {
+    uint32_t neuron_id;
+    float weight;
+  }Weight;
+
+  NeuralNetworkModel() {};
+  NeuralNetworkModel(const Parameters& parameters);
   virtual ~NeuralNetworkModel() {};
 
-  virtual void update(const bool internal_potential) {};
-
-	uint32_t getNumNeuron(){
-		return num_neurons;
-	}
-
-  std::string output(int N);
-  double calcE(int N);
+  virtual void simulate() {};
 
 protected:
 	float func(const float input);
+	float inverseFunc(const float input);
 
-  std::vector<float> neuron_potentials;
-	std::vector<float> neuron_outputs;
-	std::vector<float> neuron_bias;
-  std::vector<std::vector<Weight>> neuron_weights;
+	void output();
+	void calcEnergyNQueen();
+
+  std::vector<float> potentials;
+	std::vector<float> outputs;
+	std::vector<float> outputs_old;
+	std::vector<float> biases;
+  std::vector<std::vector<Weight>> weights;
 
   std::mt19937 mt;
   std::uniform_int_distribution<> rand_int;
 
+	Parameters parameters;
 	uint32_t num_neurons;
-	float time_constant_for_multi;
+	float reciprocal_time_constant;
+	float reciprocal_base_potential;
 
 private:
-	void readWeights(const std::string& weights_file);
-	void readBias(const std::string& bias_file);
+	void readWeights();
+	void readBiases();
 
-	float base_potential;
+	std::ofstream ofs;
 };
 
 #endif

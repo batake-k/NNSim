@@ -7,7 +7,7 @@
 using namespace std;
 
 namespace utils{
-  double Get_max_memory_consumption(){
+  double getMaxMemoryConsumption(){
     char command[128];
     char field[51];
     FILE *p_file;
@@ -35,7 +35,7 @@ namespace utils{
 		return elems;
 	}
 
-	void WriteString(ofstream &ofs, const string &s){
+	/*void WriteString(ofstream &ofs, const string &s){
 		int size = s.size()+1;
 		const char *s_char = s.c_str();
 
@@ -50,5 +50,5 @@ namespace utils{
 
 		ifs.read((char*)&s_char, sizeof(char)*size);
 		return string(s_char);
-	}
+	}*/
 }
