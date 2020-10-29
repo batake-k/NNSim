@@ -23,9 +23,9 @@ namespace {
 			("output,o", po::value<std::string>(), "output file");
 
 		opt_opt.add_options()
-			("network_model,m", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")
-			("synchronize,s", po::value<bool>()->default_value(false), "syncronously update neurons, true or false")
-			("inner_potential,i", po::value<bool>()->default_value(false), "have inner potential, true of false")
+			("network_model,mi", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")
+			("synchronize,s", po::value<bool>()->default_value(false), "syncronously update, true or false")
+			("inner_potential,i", po::value<bool>()->default_value(false), "have inner potential, true or false")
 			("random_seed,r", po::value<uint32_t>()->default_value(0), "random seed")
 			("generations,g", po::value<uint32_t>()->default_value(200), "number of generations")
 			("time_constant,t", po::value<uint32_t>()->default_value(1), "time constant")

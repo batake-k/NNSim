@@ -51,23 +51,37 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.weights_file = vm["weights"].as<string>();
 	parameters.biases_file = vm["biases"].as<string>();
 
-	cout << "weights file:       " << parameters.weights_file << endl;
-	cout << "biases file:        " << parameters.biases_file << endl;
-	cout << "output file:        " << parameters.output_file << endl;
+	cout << "weights file:    " << parameters.weights_file << endl;
+	cout << "biases file:     " << parameters.biases_file << endl;
+	cout << "output file:     " << parameters.output_file << endl << endl;
 
 	parameters.model = vm["network_model"].as<char>();
+	parameters.standard_deviation = vm["standard_deviation"].as<float>();
 
 	if(parameters.model == 'h'){
 		cout << "network model:      hopfield" << endl;
 	}else if(parameters.model == 'g'){
 		cout << "network model:      gaussian" << endl;
+		cout << "L standard_deviation: " << parameters.standard_deviation << endl;
 	}
 
 	parameters.synchronize = vm["synchronize"].as<bool>();
-	cout << "shynchronize:       " << parameters.synchronize << endl;
+	if(parameters.synchronize){
+		cout << "synchronize:        true" << endl;
+	}else{
+		cout << "synchronize:        false" << endl;
+	}
 
 	parameters.inner_potential = vm["inner_potential"].as<bool>();
-	cout << "inner potential: " << parameters.inner_potential << endl;
+	parameters.time_constant = vm["time_constant"].as<uint32_t>();
+	parameters.delta_t = vm["delta_t"].as<float>();
+	if(parameters.inner_potential){
+		cout << "inner potential:    true" << endl;
+		cout << "L time_constant:      " << parameters.time_constant << endl;
+		cout << "L delta_t:            " << parameters.delta_t << endl;
+	}else{
+		cout << "inner potential:    false" << endl;
+	}
 
 	parameters.seed = vm["random_seed"].as<uint32_t>();
 	cout << "random seed:        " << parameters.seed << endl;
@@ -75,8 +89,6 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.generations = vm["generations"].as<uint32_t>();
 	cout << "generations:        " << parameters.generations << endl;
 
-	parameters.time_constant = vm["time_constant"].as<uint32_t>();
-	parameters.delta_t = vm["delta_t"].as<float>();
 	parameters.base_potential = vm["base_potential"].as<float>();
-	parameters.standard_deviation = vm["standard_deviation"].as<float>();
+	cout << "base potential:     " << parameters.base_potential << endl << endl;
 }
