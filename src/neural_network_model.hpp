@@ -23,16 +23,16 @@ public:
 		float base_potential;
 	}Parameters;
 
-  typedef struct {
-    uint32_t neuron_id;
-    float weight;
-  }Weight;
+	typedef struct {
+		uint32_t neuron_id;
+		float weight;
+	}Weight;
 
-  NeuralNetworkModel() {};
-  NeuralNetworkModel(const Parameters& parameters);
-  virtual ~NeuralNetworkModel() {};
+	NeuralNetworkModel() {};
+	NeuralNetworkModel(const Parameters& parameters);
+	virtual ~NeuralNetworkModel() {};
 
-  virtual void simulate() {};
+	virtual void simulate() {};
 
 protected:
 	float func(const float input);
@@ -41,14 +41,14 @@ protected:
 	void output();
 	void calcEnergyNQueen();
 
-  std::vector<float> potentials;
+	std::vector<float> potentials;
 	std::vector<float> outputs;
 	std::vector<float> outputs_old;
 	std::vector<float> biases;
-  std::vector<std::vector<Weight>> weights;
+	std::vector<std::vector<Weight>> weights;
 
-  std::mt19937 mt;
-  std::uniform_int_distribution<> rand_int;
+	std::mt19937 mt;
+	std::uniform_int_distribution<> rand_int;
 
 	Parameters parameters;
 	uint32_t num_neurons;

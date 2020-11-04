@@ -13,7 +13,7 @@ void NeuralNetworkModel::readBiases(){
 
 	uint32_t size;
 	ifs.read((char*)&size, sizeof(uint32_t));
-  biases.resize(size);
+	biases.resize(size);
 
 	ifs.read((char*)&biases[0], sizeof(float)*size);
 	ifs.close();
@@ -40,10 +40,10 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 
 	//read bias file, and init biases
 	Timer timer;
-  readBiases();
+	readBiases();
 	timer.elapsed("read biases file", 2);
 
-  //read weights file, and init weights
+	//read weights file, and init weights
 	timer.restart();
 	readWeights();
 	timer.elapsed("read weights file", 2);
@@ -67,11 +67,11 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 	outputs_old.resize(num_neurons);
 
 	uniform_real_distribution<> rand_real(0.0, 1.0);
-  for(uint32_t i=0; i<num_neurons; ++i){
+	for(uint32_t i=0; i<num_neurons; ++i){
 		outputs[i] = 0.5 + 0.001 * rand_real(mt);
 		outputs_old[i] = outputs[i];
 		potentials[i] = inverseFunc(outputs[i]);
-  }
+	}
 	timer.elapsed("init neurons", 2);
 }
 
@@ -79,76 +79,76 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 void NeuralNetworkModel::output(){
 	int N = sqrt(num_neurons);
 
-  for(uint32_t i=0; i<num_neurons; ++i){
-    if(i % N == 0 && i != 0){
-      ofs << endl;
-    }
+	for(uint32_t i=0; i<num_neurons; ++i){
+		if(i % N == 0 && i != 0){
+			ofs << endl;
+		}
 
 		ofs << outputs[i] << ",";
-  }
-  ofs << endl;
+	}
+	ofs << endl;
 }
 
 void NeuralNetworkModel::calcEnergyNQueen(){
 
 	int N = sqrt(num_neurons);
-  double E = 0;
+	double E = 0;
 
-  for(int x=0; x<N; ++x){
-    double a = 0;
-    for(int y=0; y<N; ++y){
-      a += outputs[x * N + y];
-    }
-    E += (a - 1) * (a - 1);
-  }
+	for(int x=0; x<N; ++x){
+		double a = 0;
+		for(int y=0; y<N; ++y){
+			a += outputs[x * N + y];
+		}
+		E += (a - 1) * (a - 1);
+	}
 
-  for(int y=0; y<N; ++y){
-    double b = 0;
-    for(int x=0; x<N; ++x){
-      b += outputs[x * N + y];
-    }
-    E += (b - 1) * (b - 1);
-  }
+	for(int y=0; y<N; ++y){
+		double b = 0;
+		for(int x=0; x<N; ++x){
+			b += outputs[x * N + y];
+		}
+		E += (b - 1) * (b - 1);
+	}
 
-  for(int i=0; i <= 2*N-2; ++i){
-    for(int x=0; x<N; ++x){
+	for(int i=0; i <= 2*N-2; ++i){
+		for(int x=0; x<N; ++x){
 
-      int y = i - x;
-      if(y < 0 || y >= N){
-        continue;
-      }
+			int y = i - x;
+			if(y < 0 || y >= N){
+				continue;
+			}
 
-      for(int X=0; X<N; ++X){
+			for(int X=0; X<N; ++X){
 
-        int Y = i - X;
-        if(Y < 0 || Y >= N || x == X){
-          continue;
-        }
-        E += outputs[x * N + y] * outputs[X * N + Y];
-      }
-    }
-  }
+				int Y = i - X;
+				if(Y < 0 || Y >= N || x == X){
+					continue;
+				}
+				E += outputs[x * N + y] * outputs[X * N + Y];
+			}
+		}
+	}
 
-  for(int j=1-N; j <= N-1; ++j){
-    for(int x=0; x<N; ++x){
+	for(int j=1-N; j <= N-1; ++j){
+		for(int x=0; x<N; ++x){
 
-      int y = j + x;
-      if(y < 0 || y >= N){
-        continue;
-      }
+			int y = j + x;
+			if(y < 0 || y >= N){
+				continue;
+			}
 
-      for(int X=0; X<N; ++X){
+			for(int X=0; X<N; ++X){
 
-        int Y = j + X;
-        if(Y < 0 || Y >= N || x == X){
-          continue;
-        }
-        E += outputs[x * N + y] * outputs[X * N + Y];
-      }
-    }
-  }
+				int Y = j + X;
+				if(Y < 0 || Y >= N || x == X){
+					continue;
+				}
+				E += outputs[x * N + y] * outputs[X * N + Y];
+			}
+		}
+	}
 
-  ofs << "E: " << E << endl;
+	ofs << "E: " << E << endl;
 }
 
 //logit
