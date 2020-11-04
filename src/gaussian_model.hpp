@@ -7,10 +7,9 @@
 
 class GaussianModel : public NeuralNetworkModel {
 public:
-  GaussianModel(const std::string& weights_file, const std::string& bias_file,
-			const int seed, const int time_constant, const float base_potential, const float standard_deviation);
+  GaussianModel(const Parameters& parameters, const float standard_deviation);
 
-  void update(const bool internal_potential);
+  void simulate();
 
 private:
   std::normal_distribution<> rand_dist;

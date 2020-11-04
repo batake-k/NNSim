@@ -7,10 +7,9 @@
 
 class HopfieldModel : public NeuralNetworkModel {
 public:
-  HopfieldModel(const std::string& weights_file, const std::string& bias_file,
-			const int seed, const int time_constant, const float base_potential);
+  HopfieldModel(const Parameters& parameters);
 
-  void update(const bool internal_potential);
+  void simulate();
 
 private:
 };

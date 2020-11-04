@@ -2,6 +2,7 @@
 #define TIMER_HPP
 
 #include <string>
+#include <iostream>
 #include <time.h>
 
 class Timer {
