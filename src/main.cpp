@@ -24,10 +24,10 @@ namespace {
 
 		opt_opt.add_options()
 			("network_model,m", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")
-			("synchronize,s", po::value<bool>()->default_value(false), "syncronously update, true or false")
-			("inner_potential,i", po::value<bool>()->default_value(false), "have inner potential, true or false")
+			("synchronize,s", po::value<bool>()->default_value(true), "syncronously update, true or false")
+			("inner_potential,i", po::value<bool>()->default_value(true), "have inner potential, true or false")
 			("random_seed,r", po::value<uint32_t>()->default_value(0), "random seed")
-			("generations,g", po::value<uint32_t>()->default_value(200), "number of generations")
+			("generations,g", po::value<uint32_t>()->default_value(100), "number of generations")
 			("time_constant,t", po::value<uint32_t>()->default_value(1), "time constant")
 			("delta_t,d", po::value<float>()->default_value(0.01), "delta t")
 			("base_potential,B", po::value<float>()->default_value(0.01), "base potential in tanh")
