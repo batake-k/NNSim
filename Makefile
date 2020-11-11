@@ -14,7 +14,6 @@ endif
 
 CPP_SRC=./src/main.cpp \
   ./src/gaussian_model.cpp \
-  ./src/hopfield_model.cpp \
   ./src/neural_network_model.cpp \
 	./src/simulator.cpp \
   ./src/utils.cpp \

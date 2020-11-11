@@ -1,6 +1,5 @@
 #include "simulator.hpp"
 #include "gaussian_model.hpp"
-#include "hopfield_model.hpp"
 #include "timer.hpp"
 
 #include <iostream>
@@ -33,16 +32,11 @@ void Simulator::run(po::variables_map &vm){
 	NeuralNetworkModel::Parameters NNM_parameters;
 	setNNMParameters(parameters, NNM_parameters);
 
-	std::shared_ptr<NeuralNetworkModel> model;
-	if(parameters.model == 'h'){
-		model = make_shared<HopfieldModel>(NNM_parameters);
-	}else if(parameters.model == 'g'){
-		model = make_shared<GaussianModel>(NNM_parameters, parameters.standard_deviation);
-	}
+	GaussianModel model(NNM_parameters, parameters.standard_deviation);
 	timer.elapsed("init network model", 1);
 
 	timer.restart();
-	model->simulate();
+	model.simulate();
 	timer.elapsed("update neurons", 1);
 }
 
@@ -59,36 +53,38 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.standard_deviation = vm["standard_deviation"].as<float>();
 
 	if(parameters.model == 'h'){
-		cout << "network model:      hopfield" << endl;
+		parameters.standard_deviation = 0.;
+		cout << "network model:    hopfield" << endl;
+		cout << "L standard_deviation: " << parameters.standard_deviation << endl;
 	}else if(parameters.model == 'g'){
-		cout << "network model:      gaussian" << endl;
+		cout << "network model:    gaussian" << endl;
 		cout << "L standard_deviation: " << parameters.standard_deviation << endl;
 	}
 
 	parameters.synchronize = vm["synchronize"].as<bool>();
 	if(parameters.synchronize){
-		cout << "synchronize:        true" << endl;
+		cout << "synchronize:      true" << endl;
 	}else{
-		cout << "synchronize:        false" << endl;
+		cout << "synchronize:      false" << endl;
 	}
 
 	parameters.inner_potential = vm["inner_potential"].as<bool>();
 	parameters.time_constant = vm["time_constant"].as<uint32_t>();
 	parameters.delta_t = vm["delta_t"].as<float>();
 	if(parameters.inner_potential){
-		cout << "inner potential:    true" << endl;
+		cout << "inner potential:  true" << endl;
 		cout << "L time_constant:      " << parameters.time_constant << endl;
 		cout << "L delta_t:            " << parameters.delta_t << endl;
 	}else{
-		cout << "inner potential:    false" << endl;
+		cout << "inner potential:  false" << endl;
 	}
 
 	parameters.seed = vm["random_seed"].as<uint32_t>();
-	cout << "random seed:        " << parameters.seed << endl;
+	cout << "random seed:      " << parameters.seed << endl;
 
 	parameters.generations = vm["generations"].as<uint32_t>();
-	cout << "generations:        " << parameters.generations << endl;
+	cout << "generations:      " << parameters.generations << endl;
 
 	parameters.base_potential = vm["base_potential"].as<float>();
-	cout << "base potential:     " << parameters.base_potential << endl << endl;
+	cout << "base potential:   " << parameters.base_potential << endl << endl;
 }
