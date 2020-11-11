@@ -66,7 +66,7 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 	outputs.resize(num_neurons);
 	outputs_old.resize(num_neurons);
 
-	uniform_real_distribution<> rand_real(0.0, 1.0);
+	uniform_real_distribution<> rand_real(-0.5, 0.5);
 	for(uint32_t i=0; i<num_neurons; ++i){
 		outputs[i] = 0.5 + 0.001 * rand_real(mt);
 		outputs_old[i] = outputs[i];
@@ -80,16 +80,29 @@ void NeuralNetworkModel::output(){
 	int N = sqrt(num_neurons);
 
 	for(uint32_t i=0; i<num_neurons; ++i){
-		if(i % N == 0 && i != 0){
-			ofs << endl;
+		if((i+1) % N == 0){
+			ofs << outputs[i] << endl;
+		}else{
+			ofs << outputs[i] << ",";
 		}
-
-		ofs << outputs[i] << ",";
 	}
 	ofs << endl;
 }
 
-void NeuralNetworkModel::calcEnergyNQueen(){
+void NeuralNetworkModel::outputU(){
+	int N = sqrt(num_neurons);
+
+	for(uint32_t i=0; i<num_neurons; ++i){
+		if((i+1) % N == 0){
+			ofs << potentials[i] << endl;
+		}else{
+			ofs << potentials[i] << ",";
+		}
+	}
+	ofs << endl;
+}
+
+bool NeuralNetworkModel::calcEnergyNQueen(){
 
 	int N = sqrt(num_neurons);
 	double E = 0;
@@ -148,7 +161,13 @@ void NeuralNetworkModel::calcEnergyNQueen(){
 		}
 	}
 
-	ofs << "E: " << E << endl;
+	cout << E << endl;
+
+	if(E == 0){
+		return true;
+	}else{
+		return false;
+	}
 }
 
 //logit

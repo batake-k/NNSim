@@ -39,7 +39,8 @@ protected:
 	float inverseFunc(const float input);
 
 	void output();
-	void calcEnergyNQueen();
+	void outputU();
+	bool calcEnergyNQueen();
 
 	std::vector<float> potentials;
 	std::vector<float> outputs;
