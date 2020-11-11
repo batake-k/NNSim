@@ -13,7 +13,7 @@ GaussianModel::GaussianModel(const Parameters& parameters, const float standard_
 
 void GaussianModel::simulate(){
 
-	calcEnergyNQueen();
+	bool temp = calcEnergyNQueen();
 	Timer timer;
 
 	if(parameters.synchronize){
@@ -35,7 +35,7 @@ void GaussianModel::simulate(){
 					outputs_old[i] = outputs[i];
 				}
 				timer.elapsed("update", 2);
-				calcEnergyNQueen();
+				if(calcEnergyNQueen()) break;
 			}
 
 		}else{
@@ -55,7 +55,7 @@ void GaussianModel::simulate(){
 					outputs_old[i] = outputs[i];
 				}
 				timer.elapsed("update", 2);
-				calcEnergyNQueen();
+				if(calcEnergyNQueen()) break;
 			}
 
 		}
@@ -75,7 +75,7 @@ void GaussianModel::simulate(){
 					outputs[id] = func(potentials[id]);
 				}
 				timer.elapsed("update", 2);
-				calcEnergyNQueen();
+				if(calcEnergyNQueen()) break;
 			}
 
 		}else{
@@ -92,11 +92,11 @@ void GaussianModel::simulate(){
 					outputs[id] = func(input_sum + biases[id] + rand_dist(mt));
 				}
 				timer.elapsed("update", 2);
-				calcEnergyNQueen();
+				if(calcEnergyNQueen()) break;
 			}
 
 		}
 	}
 
-	output();
+	//output();
 }
