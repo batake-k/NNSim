@@ -57,7 +57,6 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 	rand_int = uniform_int_distribution<>(0, num_neurons -1);
 
 	//calc reciprocal_time_constant and reciprocal_base_potential for update potentials
-	reciprocal_base_potential = 1.0 / parameters.base_potential;
 	reciprocal_time_constant = 1.0 / parameters.time_constant;
 
 	//init potentials, neuron_outputs
@@ -66,12 +65,6 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 	outputs.resize(num_neurons);
 	outputs_old.resize(num_neurons);
 
-	uniform_real_distribution<> rand_real(-0.5, 0.5);
-	for(uint32_t i=0; i<num_neurons; ++i){
-		outputs[i] = 0.5 + 0.001 * rand_real(mt);
-		outputs_old[i] = outputs[i];
-		potentials[i] = inverseFunc(outputs[i]);
-	}
 	timer.elapsed("init neurons", 2);
 }
 
@@ -168,15 +161,4 @@ bool NeuralNetworkModel::calcEnergyNQueen(){
 	}else{
 		return false;
 	}
-}
-
-//logit
-float NeuralNetworkModel::inverseFunc(const float input){
-	return log(input / (1.0 - input)) / reciprocal_base_potential;
-}
-
-//sigmoid
-float NeuralNetworkModel::func(const float input){
-	//return (std::tanh(input / base_potential) + 1) / 2;
-	return 1.0 / (1.0 + exp(- input * reciprocal_base_potential));
 }

@@ -20,7 +20,11 @@ namespace{
 		NNMp.generations = p.generations;
 		NNMp.time_constant = p.time_constant;
 		NNMp.delta_t = p.delta_t;
-		NNMp.base_potential = p.base_potential;
+	}
+
+	void setGMSParameters(const Simulator::Parameters& p, GaussianModel::SharpeningParameters& GMSp){
+		GMSp.Tmf = p.Tmf;
+		GMSp.time_constant_Tmf = p.time_constant_Tmf;
 	}
 };
 
@@ -31,7 +35,10 @@ void Simulator::run(po::variables_map &vm){
 	NeuralNetworkModel::Parameters NNM_parameters;
 	setNNMParameters(parameters, NNM_parameters);
 
-	GaussianModel model(NNM_parameters, parameters.standard_deviation);
+	GaussianModel::SharpeningParameters GMS_parameters;
+	setGMSParameters(parameters, GMS_parameters);
+
+	GaussianModel model(NNM_parameters, GMS_parameters, parameters.standard_deviation);
 	timer.elapsed("init network model", 1);
 
 	timer.restart();
@@ -86,6 +93,10 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.generations = vm["generations"].as<uint32_t>();
 	cout << "generations:      " << parameters.generations << endl;
 
-	parameters.base_potential = vm["base_potential"].as<float>();
-	cout << "base potential:   " << parameters.base_potential << endl << endl;
+	//Gaussian Sharpening Parameters
+	parameters.Tmf = vm["Tmf"].as<float>();
+	cout << "Tmf:   						" << parameters.Tmf << endl;
+
+	parameters.time_constant_Tmf = vm["time_constant_Tmf"].as<uint32_t>();
+	cout << "time constant Tmf: " << parameters.time_constant_Tmf << endl << endl;
 }

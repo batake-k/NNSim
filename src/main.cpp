@@ -30,7 +30,8 @@ namespace {
 			("generations,g", po::value<uint32_t>()->default_value(100), "number of generations")
 			("time_constant,t", po::value<uint32_t>()->default_value(1), "time constant")
 			("delta_t,d", po::value<float>()->default_value(0.01), "delta t")
-			("base_potential,B", po::value<float>()->default_value(0.01), "base potential in tanh")
+			("Tmf", po::value<float>()->default_value(1.0), "Tmf in tanh")
+			("time_constant_Tmf", po::value<uint32_t>()->default_value(100), "time constant Tmf")
 			("standard_deviation,S", po::value<float>()->default_value(0.1), "standard deviation for noise");
 
 		opt.add(req_opt).add(opt_opt);

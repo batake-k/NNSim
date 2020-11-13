@@ -23,8 +23,11 @@ public:
 		uint32_t generations;
 		uint32_t time_constant;
 		float delta_t;
-		float base_potential;
 		float standard_deviation;
+
+		//Gaussian Sharpening Parameters
+		float Tmf;
+		uint32_t time_constant_Tmf;
 	}Parameters;
 
 	Simulator(){};
