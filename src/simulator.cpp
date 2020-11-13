@@ -23,8 +23,13 @@ namespace{
 	}
 
 	void setGMSParameters(const Simulator::Parameters& p, GaussianModel::SharpeningParameters& GMSp){
-		GMSp.Tmf = p.Tmf;
-		GMSp.time_constant_Tmf = p.time_constant_Tmf;
+		GMSp.T_mf = p.T_mf;
+		GMSp.time_constant_T_mf = p.time_constant_T_mf;
+	}
+
+	void setGMAParameters(const Simulator::Parameters& p, GaussianModel::AnnealingParameters& GMAp){
+		GMAp.T_epsilon = p.T_epsilon;
+		GMAp.time_constant_T_epsilon = p.time_constant_T_epsilon;
 	}
 };
 
@@ -38,7 +43,10 @@ void Simulator::run(po::variables_map &vm){
 	GaussianModel::SharpeningParameters GMS_parameters;
 	setGMSParameters(parameters, GMS_parameters);
 
-	GaussianModel model(NNM_parameters, GMS_parameters, parameters.standard_deviation);
+	GaussianModel::AnnealingParameters GMA_parameters;
+	setGMAParameters(parameters, GMA_parameters);
+
+	GaussianModel model(NNM_parameters, GMS_parameters, GMA_parameters);
 	timer.elapsed("init network model", 1);
 
 	timer.restart();
@@ -51,52 +59,55 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.weights_file = vm["weights"].as<string>();
 	parameters.biases_file = vm["biases"].as<string>();
 
-	cout << "weights file:    " << parameters.weights_file << endl;
-	cout << "biases file:     " << parameters.biases_file << endl;
-	cout << "output file:     " << parameters.output_file << endl << endl;
+	cout << "weights file:      " << parameters.weights_file << endl;
+	cout << "biases file:       " << parameters.biases_file << endl;
+	cout << "output file:       " << parameters.output_file << endl << endl;
 
 	parameters.model = vm["network_model"].as<char>();
-	parameters.standard_deviation = vm["standard_deviation"].as<float>();
 
 	if(parameters.model == 'h'){
-		parameters.standard_deviation = 0.;
-		cout << "network model:    hopfield" << endl;
-		cout << "L standard_deviation: " << parameters.standard_deviation << endl;
+		cout << "network model:      hopfield" << endl;
 	}else if(parameters.model == 'g'){
-		cout << "network model:    gaussian" << endl;
-		cout << "L standard_deviation: " << parameters.standard_deviation << endl;
+		cout << "network model:      gaussian" << endl;
 	}
 
 	parameters.synchronize = vm["synchronize"].as<bool>();
 	if(parameters.synchronize){
-		cout << "synchronize:      true" << endl;
+		cout << "synchronize:        true" << endl;
 	}else{
-		cout << "synchronize:      false" << endl;
+		cout << "synchronize:        false" << endl;
 	}
 
 	parameters.inner_potential = vm["inner_potential"].as<bool>();
 	parameters.time_constant = vm["time_constant"].as<uint32_t>();
 	parameters.delta_t = vm["delta_t"].as<float>();
 	if(parameters.inner_potential){
-		cout << "inner potential:  true" << endl;
+		cout << "inner potential:    true" << endl;
 	}else{
-		cout << "inner potential:  false" << endl;
+		cout << "inner potential:    false" << endl;
 		parameters.time_constant = 1.0;
 		parameters.delta_t = 1.0;
 	}
-	cout << "L time_constant:      " << parameters.time_constant << endl;
-	cout << "L delta_t:            " << parameters.delta_t << endl;
+	cout << "L time_constant:        " << parameters.time_constant << endl;
+	cout << "L delta_t:              " << parameters.delta_t << endl;
 
 	parameters.seed = vm["random_seed"].as<uint32_t>();
-	cout << "random seed:      " << parameters.seed << endl;
+	cout << "random seed:        " << parameters.seed << endl;
 
 	parameters.generations = vm["generations"].as<uint32_t>();
-	cout << "generations:      " << parameters.generations << endl;
+	cout << "generations:        " << parameters.generations << endl;
 
 	//Gaussian Sharpening Parameters
-	parameters.Tmf = vm["Tmf"].as<float>();
-	cout << "Tmf:   						" << parameters.Tmf << endl;
+	parameters.T_mf = vm["T_mf"].as<float>();
+	cout << "T_mf:               " << parameters.T_mf << endl;
 
-	parameters.time_constant_Tmf = vm["time_constant_Tmf"].as<uint32_t>();
-	cout << "time constant Tmf: " << parameters.time_constant_Tmf << endl << endl;
+	parameters.time_constant_T_mf = vm["time_constant_T_mf"].as<uint32_t>();
+	cout << "time constant T_mf: " << parameters.time_constant_T_mf << endl;
+
+	//Gaussian Annealing Parameters
+	parameters.T_epsilon = vm["T_epsilon"].as<float>();
+	cout << "T_epsilon:          " << parameters.T_epsilon << endl;
+
+	parameters.time_constant_T_epsilon = vm["time_constant_T_epsilon"].as<uint32_t>();
+	cout << "time constant T_epsilon: " << parameters.time_constant_T_epsilon << endl << endl;
 }

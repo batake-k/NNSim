@@ -10,26 +10,35 @@ class GaussianModel : public NeuralNetworkModel {
 public:
 
 	typedef struct{
-		float Tmf;
-		uint32_t time_constant_Tmf;
-		std::vector<float> reciprocal_Tmf;
+		uint32_t time_constant_T_mf;
+		float T_mf;
+		float current_T_mf;
+		float reciprocal_current_T_mf;
 	}SharpeningParameters;
 
-	GaussianModel(const Parameters& parameters, const SharpeningParameters& s_parameters, const float standard_deviation);
+	typedef struct{
+		uint32_t time_constant_T_epsilon;
+		float T_epsilon;
+		float current_T_epsilon;
+	}AnnealingParameters;
+
+	GaussianModel(const Parameters& p, const SharpeningParameters& sp, const AnnealingParameters& ap);
 
 	void simulate();
 
 private:
-	void calculateReciprocalTmf(const uint32_t generations);
+	void calculateT_mf(const uint32_t generation);
+	void calculateT_epsilon(const uint32_t generation);
 
 	void initNeurons();
+
+	void calcFreeEnergy(const uint32_t generation);
 
 	float func(const float input, const uint32_t generation);
 	float inverseFunc(const float input);
 
 	SharpeningParameters sharpening_parameters;
-
-	std::normal_distribution<> rand_dist;
+	AnnealingParameters annealing_parameters;
 };
 
 #endif

@@ -8,30 +8,34 @@
 
 using namespace std;
 
-GaussianModel::GaussianModel(const Parameters& parameters, const SharpeningParameters& s_parameters, const float standard_deviation):
-		NeuralNetworkModel(parameters), sharpening_parameters(s_parameters){
+GaussianModel::GaussianModel(const Parameters& p, const SharpeningParameters& sp, const AnnealingParameters& ap):
+		NeuralNetworkModel(p), sharpening_parameters(sp), annealing_parameters(ap){
+
+	calculateT_mf(0);
+	calculateT_epsilon(0);
 
 	initNeurons();
-	calculateReciprocalTmf(parameters.generations);
-
-  rand_dist = normal_distribution<>(0.0, standard_deviation);
 }
 
 void GaussianModel::simulate(){
 
-	calcEnergy();
+	calcFreeEnergy(0);
 	Timer timer;
 
 	if(parameters.synchronize){
 
 		for(uint32_t generation=0; generation<parameters.generations; ++generation ){
 			timer.restart();
+			calculateT_mf(generation);
+			calculateT_epsilon(generation);
+			std::normal_distribution<> dist = std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
+
 			for(uint32_t i=0; i<num_neurons; ++i){
 				float input_sum = 0;
 				for(const auto& w : weights[i]){
 					input_sum += outputs_old[w.neuron_id] * w.weight;
 				}
-				potentials[i] += parameters.delta_t * (- reciprocal_time_constant * potentials[i] + input_sum + biases[i] + rand_dist(mt));
+				potentials[i] += parameters.delta_t * (- reciprocal_time_constant * potentials[i] + input_sum + biases[i] + dist(mt));
 				outputs[i] = func(potentials[i], generation);
 			}
 
@@ -39,24 +43,28 @@ void GaussianModel::simulate(){
 				outputs_old[i] = outputs[i];
 			}
 			timer.elapsed("update", 2);
-			calcEnergy();
+			calcFreeEnergy(generation);
 		}
 
 	}else{
 
 		for(uint32_t generation=0; generation<parameters.generations; ++generation ){
 			timer.restart();
+			calculateT_mf(generation);
+			calculateT_epsilon(generation);
+			std::normal_distribution<> dist = std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
+
 			for(uint32_t i=0; i<num_neurons; ++i){
 				uint32_t id = rand_int(mt);
 				float input_sum = 0;
 				for(const auto& w : weights[id]){
 					input_sum += outputs[w.neuron_id] * w.weight;
 				}
-				potentials[id] += parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + biases[id] + rand_dist(mt));
+				potentials[id] += parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + biases[id] + dist(mt));
 				outputs[id] = func(potentials[id], generation);
 			}
 			timer.elapsed("update", 2);
-			calcEnergy();
+			calcFreeEnergy(generation);
 		}
 
 	}
@@ -67,29 +75,45 @@ void GaussianModel::initNeurons(){
 	int N = std::sqrt(num_neurons);
 	float value = 1.0 / N;
 
-	uniform_real_distribution<> rand_real(-value, value);
+	uniform_real_distribution<> rand_real(0, 2 * value);
 	for(uint32_t i=0; i<num_neurons; ++i){
-		outputs[i] = value + rand_real(mt);
+		outputs[i] = rand_real(mt);
 		outputs_old[i] = outputs[i];
 		potentials[i] = inverseFunc(outputs[i]);
 	}
 }
 
-void GaussianModel::calculateReciprocalTmf(const uint32_t generations){
-	for(uint32_t i=0; i<generations; ++i){
-		float Tmf_candidate1 = sharpening_parameters.Tmf * (1 - (float)i / sharpening_parameters.time_constant_Tmf);
-		float Tmf_candidate2 = 1e-6;
-		float Tmf = std::max(Tmf_candidate1, Tmf_candidate2);
-		sharpening_parameters.reciprocal_Tmf.emplace_back(1.0 / Tmf);
-	}
+void GaussianModel::calculateT_epsilon(const uint32_t generation){
+	float T_epsilon_candidate = annealing_parameters.T_epsilon * (1.0 - (float)generation / annealing_parameters.time_constant_T_epsilon);
+	annealing_parameters.current_T_epsilon = std::max(T_epsilon_candidate, (float)1e-6);
+}
+
+void GaussianModel::calculateT_mf(const uint32_t generation){
+	float T_mf_candidate = sharpening_parameters.T_mf * (1.0 - (float)generation / sharpening_parameters.time_constant_T_mf);
+	sharpening_parameters.current_T_mf = std::max(T_mf_candidate, (float)1e-6);
+	sharpening_parameters.reciprocal_current_T_mf = 1.0/sharpening_parameters.current_T_mf;
 }
 
 //logit
 float GaussianModel::inverseFunc(const float input){
-	return log(input / (1.0 - input)) * sharpening_parameters.Tmf;
+	return log(input / (1.0 - input)) * sharpening_parameters.current_T_mf;
 }
 
 //sigmoid
 float GaussianModel::func(const float input, const uint32_t generation){
-	return 1.0 / (1.0 + exp(- input * sharpening_parameters.reciprocal_Tmf[generation]));
+	return 1.0 / (1.0 + exp(- input * sharpening_parameters.reciprocal_current_T_mf));
+}
+
+void GaussianModel::calcFreeEnergy(const uint32_t generation){
+	double E = calcEnergy();
+	cout << "E: " << E << endl;
+
+	double S = 0;
+	for(uint32_t i=0; i<num_neurons; ++i){
+		float v = outputs[i];
+		S += v * std::log(1.0 / v) + (1.0 - v) * std::log(1.0 / (1.0 - v));
+	}
+
+	double F = E - sharpening_parameters.current_T_mf * S;
+	cout << "F: " << F << endl;
 }

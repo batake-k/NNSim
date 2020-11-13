@@ -36,7 +36,7 @@ void NeuralNetworkModel::readWeights(){
 	ifs.close();
 }
 
-NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters(_parameters){
+NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 
 	//read bias file, and init biases
 	Timer timer;
@@ -95,7 +95,7 @@ void NeuralNetworkModel::outputU(){
 	ofs << endl;
 }
 
-void NeuralNetworkModel::calcEnergy(){
+double NeuralNetworkModel::calcEnergy(){
 	double E = 0;
 
 	for(uint32_t i=0; i<num_neurons; ++i){
@@ -106,5 +106,5 @@ void NeuralNetworkModel::calcEnergy(){
 		E -= outputs[i] * biases[i];
 	}
 
-	ofs << E << endl;
+	return E;
 }

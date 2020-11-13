@@ -35,7 +35,7 @@ public:
 protected:
 	void output();
 	void outputU();
-	void calcEnergy();
+	double calcEnergy();
 
 	std::vector<float> potentials;
 	std::vector<float> outputs;
