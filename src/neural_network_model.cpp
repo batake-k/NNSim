@@ -95,70 +95,16 @@ void NeuralNetworkModel::outputU(){
 	ofs << endl;
 }
 
-bool NeuralNetworkModel::calcEnergyNQueen(){
-
-	int N = sqrt(num_neurons);
+void NeuralNetworkModel::calcEnergy(){
 	double E = 0;
 
-	for(int x=0; x<N; ++x){
-		double a = 0;
-		for(int y=0; y<N; ++y){
-			a += outputs[x * N + y];
+	for(uint32_t i=0; i<num_neurons; ++i){
+		for(const auto& w : weights[i]){
+			E -= 0.5 * outputs[i] * outputs[w.neuron_id] * w.weight;
 		}
-		E += (a - 1) * (a - 1);
+
+		E -= outputs[i] * biases[i];
 	}
 
-	for(int y=0; y<N; ++y){
-		double b = 0;
-		for(int x=0; x<N; ++x){
-			b += outputs[x * N + y];
-		}
-		E += (b - 1) * (b - 1);
-	}
-
-	for(int i=0; i <= 2*N-2; ++i){
-		for(int x=0; x<N; ++x){
-
-			int y = i - x;
-			if(y < 0 || y >= N){
-				continue;
-			}
-
-			for(int X=0; X<N; ++X){
-
-				int Y = i - X;
-				if(Y < 0 || Y >= N || x == X){
-					continue;
-				}
-				E += outputs[x * N + y] * outputs[X * N + Y];
-			}
-		}
-	}
-
-	for(int j=1-N; j <= N-1; ++j){
-		for(int x=0; x<N; ++x){
-
-			int y = j + x;
-			if(y < 0 || y >= N){
-				continue;
-			}
-
-			for(int X=0; X<N; ++X){
-
-				int Y = j + X;
-				if(Y < 0 || Y >= N || x == X){
-					continue;
-				}
-				E += outputs[x * N + y] * outputs[X * N + Y];
-			}
-		}
-	}
-
-	cout << E << endl;
-
-	if(E == 0){
-		return true;
-	}else{
-		return false;
-	}
+	ofs << E << endl;
 }
