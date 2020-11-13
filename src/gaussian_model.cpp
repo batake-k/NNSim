@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -62,9 +63,13 @@ void GaussianModel::simulate(){
 }
 
 void GaussianModel::initNeurons(){
-	uniform_real_distribution<> rand_real(-0.5, 0.5);
+	//TODO
+	int N = std::sqrt(num_neurons);
+	float value = 1.0 / N;
+
+	uniform_real_distribution<> rand_real(-value, value);
 	for(uint32_t i=0; i<num_neurons; ++i){
-		outputs[i] = 0.5 + 0.001 * rand_real(mt);
+		outputs[i] = value + rand_real(mt);
 		outputs_old[i] = outputs[i];
 		potentials[i] = inverseFunc(outputs[i]);
 	}
