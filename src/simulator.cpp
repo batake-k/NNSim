@@ -16,7 +16,6 @@ namespace{
 		NNMp.output_file = p.output_file;
 
 		NNMp.synchronize = p.synchronize;
-		NNMp.inner_potential = p.inner_potential;
 		NNMp.seed = p.seed;
 		NNMp.generations = p.generations;
 		NNMp.time_constant = p.time_constant;
@@ -73,11 +72,13 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.delta_t = vm["delta_t"].as<float>();
 	if(parameters.inner_potential){
 		cout << "inner potential:  true" << endl;
-		cout << "L time_constant:      " << parameters.time_constant << endl;
-		cout << "L delta_t:            " << parameters.delta_t << endl;
 	}else{
 		cout << "inner potential:  false" << endl;
+		parameters.time_constant = 1.0;
+		parameters.delta_t = 1.0;
 	}
+	cout << "L time_constant:      " << parameters.time_constant << endl;
+	cout << "L delta_t:            " << parameters.delta_t << endl;
 
 	parameters.seed = vm["random_seed"].as<uint32_t>();
 	cout << "random seed:      " << parameters.seed << endl;

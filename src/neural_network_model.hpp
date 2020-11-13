@@ -15,7 +15,6 @@ public:
 		std::string output_file;
 
 		bool synchronize;
-		bool inner_potential;
 		uint32_t seed;
 		uint32_t generations;
 		uint32_t time_constant;
