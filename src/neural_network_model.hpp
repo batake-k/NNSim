@@ -51,10 +51,9 @@ protected:
 	float reciprocal_time_constant;
 
 private:
+	virtual void initNeurons() {};
 	virtual float func() {return 0;};
 	virtual float inverseFunc() {return 0;};
-
-	virtual void initNeurons() {};
 
 	void readWeights();
 	void readBiases();

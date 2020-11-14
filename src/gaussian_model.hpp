@@ -4,7 +4,6 @@
 #include "neural_network_model.hpp"
 
 #include <string>
-#include <vector>
 
 class GaussianModel : public NeuralNetworkModel {
 public:
@@ -27,14 +26,12 @@ public:
 	void simulate();
 
 private:
+	void initNeurons();
 	void calculateT_mf(const uint32_t generation);
 	void calculateT_epsilon(const uint32_t generation);
-
-	void initNeurons();
-
 	void calcFreeEnergy(const uint32_t generation);
 
-	float func(const float input, const uint32_t generation);
+	float func(const float input);
 	float inverseFunc(const float input);
 
 	SharpeningParameters sharpening_parameters;

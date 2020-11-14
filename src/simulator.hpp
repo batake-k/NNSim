@@ -2,15 +2,14 @@
 #define SIMULATOR_HPP
 
 #include <string>
-#include <fstream>
 
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
 
 class Simulator {
-
 public:
+
 	typedef struct {
 		std::string output_file;
 		std::string weights_file;
@@ -39,9 +38,10 @@ public:
 	void run(po::variables_map &vm);
 
 private:
-	Parameters parameters;
 
 	void setParameters(po::variables_map &vm);
+
+	Parameters parameters;
 };
 
 #endif

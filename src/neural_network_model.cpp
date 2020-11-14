@@ -56,16 +56,13 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	mt = mt19937(parameters.seed);
 	rand_int = uniform_int_distribution<>(0, num_neurons -1);
 
-	//calc reciprocal_time_constant and reciprocal_base_potential for update potentials
+	//calc reciprocal_time_constant for update potentials
 	reciprocal_time_constant = 1.0 / parameters.time_constant;
 
-	//init potentials, neuron_outputs
-	timer.restart();
+	//resize data
 	potentials.resize(num_neurons);
 	outputs.resize(num_neurons);
 	outputs_old.resize(num_neurons);
-
-	timer.elapsed("init neurons", 2);
 }
 
 
@@ -106,5 +103,6 @@ double NeuralNetworkModel::calcEnergy(){
 		E -= outputs[i] * biases[i];
 	}
 
+	ofs << E << endl;
 	return E;
 }

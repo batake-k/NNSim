@@ -4,8 +4,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <memory>
 
 using namespace std;
 
@@ -51,62 +49,65 @@ void Simulator::run(po::variables_map &vm){
 
 	timer.restart();
 	model.simulate();
-	timer.elapsed("update neurons", 1);
+	timer.elapsed("simulate Neural Network", 1);
 }
 
 void Simulator::setParameters(po::variables_map &vm){
+	// Required Options
+	cout << "[Required Options]" << endl;
 	parameters.output_file = vm["output"].as<string>();
 	parameters.weights_file = vm["weights"].as<string>();
 	parameters.biases_file = vm["biases"].as<string>();
 
-	cout << "weights file:      " << parameters.weights_file << endl;
-	cout << "biases file:       " << parameters.biases_file << endl;
-	cout << "output file:       " << parameters.output_file << endl << endl;
+	cout << "weights file: " << parameters.weights_file << endl;
+	cout << "biases file:  " << parameters.biases_file << endl;
+	cout << "output file:  " << parameters.output_file << endl << endl;
 
+	// Network Options
+	cout << "[Network Options]" << endl;
 	parameters.model = vm["network_model"].as<char>();
-
 	if(parameters.model == 'h'){
-		cout << "network model:      hopfield" << endl;
+		cout << "network model:   hopfield" << endl;
 	}else if(parameters.model == 'g'){
-		cout << "network model:      gaussian" << endl;
+		cout << "network model:   gaussian" << endl;
 	}
 
 	parameters.synchronize = vm["synchronize"].as<bool>();
-	if(parameters.synchronize){
-		cout << "synchronize:        true" << endl;
-	}else{
-		cout << "synchronize:        false" << endl;
-	}
+	cout << "synchronize:     " << parameters.synchronize << endl;
 
 	parameters.inner_potential = vm["inner_potential"].as<bool>();
 	parameters.time_constant = vm["time_constant"].as<uint32_t>();
 	parameters.delta_t = vm["delta_t"].as<float>();
-	if(parameters.inner_potential){
-		cout << "inner potential:    true" << endl;
-	}else{
-		cout << "inner potential:    false" << endl;
+	if(!parameters.inner_potential){
 		parameters.time_constant = 1.0;
 		parameters.delta_t = 1.0;
 	}
-	cout << "L time_constant:        " << parameters.time_constant << endl;
-	cout << "L delta_t:              " << parameters.delta_t << endl;
+	cout << "inner potential: " << parameters.inner_potential << endl;
+	cout << "time_constant:   " << parameters.time_constant << endl;
+	cout << "delta_t:         " << parameters.delta_t << endl;
 
 	parameters.seed = vm["random_seed"].as<uint32_t>();
-	cout << "random seed:        " << parameters.seed << endl;
+	cout << "random seed:     " << parameters.seed << endl;
 
 	parameters.generations = vm["generations"].as<uint32_t>();
-	cout << "generations:        " << parameters.generations << endl;
+	cout << "generations:     " << parameters.generations << endl << endl;
 
 	//Gaussian Sharpening Parameters
+	cout << "[Sharpening Parameters]" << endl;
 	parameters.T_mf = vm["T_mf"].as<float>();
-	cout << "T_mf:               " << parameters.T_mf << endl;
+	cout << "T_mf:                    " << parameters.T_mf << endl;
 
 	parameters.time_constant_T_mf = vm["time_constant_T_mf"].as<uint32_t>();
-	cout << "time constant T_mf: " << parameters.time_constant_T_mf << endl;
+	cout << "time constant T_mf:      " << parameters.time_constant_T_mf << endl << endl;
 
 	//Gaussian Annealing Parameters
-	parameters.T_epsilon = vm["T_epsilon"].as<float>();
-	cout << "T_epsilon:          " << parameters.T_epsilon << endl;
+	cout << "[Annealing Parameters]" << endl;
+	if(parameters.model == 'g'){
+		parameters.T_epsilon = vm["T_epsilon"].as<float>();
+	}else{
+		parameters.T_epsilon = 0.0;
+	}
+	cout << "T_epsilon:               " << parameters.T_epsilon << endl;
 
 	parameters.time_constant_T_epsilon = vm["time_constant_T_epsilon"].as<uint32_t>();
 	cout << "time constant T_epsilon: " << parameters.time_constant_T_epsilon << endl << endl;
