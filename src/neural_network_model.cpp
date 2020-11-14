@@ -5,6 +5,13 @@
 
 #include <iostream>
 
+#ifdef __linux__
+	#include<sys/stat.h>
+#elif _WIN32
+	#include<direct.h>
+#else
+#endif
+
 using namespace std;
 
 void NeuralNetworkModel::readBiases(){
@@ -48,7 +55,18 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	readWeights();
 	timer.elapsed("read weights file", 2);
 
-	utils::fileOpen(ofs, parameters.output_file, ios::out);
+#ifdef __linux__
+	if(mkdir(parameters.output_folder.c_str(), 0775) != 0){
+		cerr << "[ERROR] failed to create directory" << endl;
+		exit(0);
+	}
+#elif _WIN32
+	if(_makedir(parameters.output_folder) != 0){
+		cerr << "[ERROR] failed to create directory" << endl;
+		exit(0);
+	}
+#else
+#endif
 
 	num_neurons = biases.size();
 
@@ -65,8 +83,19 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	outputs_old.resize(num_neurons);
 }
 
+void NeuralNetworkModel::writeData(const uint32_t generation){
+	ofstream ofs;
+	utils::fileOpen(ofs, parameters.output_folder + "/" + to_string(generation), ios::out);
 
-void NeuralNetworkModel::output(){
+	ofs << calcEnergy() << endl << endl;
+
+	writeOutputs(ofs);
+	writePotentials(ofs);
+
+	ofs.close();
+}
+
+void NeuralNetworkModel::writeOutputs(ofstream& ofs){
 	int N = sqrt(num_neurons);
 
 	for(uint32_t i=0; i<num_neurons; ++i){
@@ -79,7 +108,7 @@ void NeuralNetworkModel::output(){
 	ofs << endl;
 }
 
-void NeuralNetworkModel::outputU(){
+void NeuralNetworkModel::writePotentials(ofstream& ofs){
 	int N = sqrt(num_neurons);
 
 	for(uint32_t i=0; i<num_neurons; ++i){
@@ -103,6 +132,5 @@ double NeuralNetworkModel::calcEnergy(){
 		E -= outputs[i] * biases[i];
 	}
 
-	ofs << E << endl;
 	return E;
 }

@@ -11,7 +11,7 @@ namespace{
 	void setNNMParameters(const Simulator::Parameters& p, NeuralNetworkModel::Parameters& NNMp){
 		NNMp.weights_file = p.weights_file;
 		NNMp.biases_file = p.biases_file;
-		NNMp.output_file = p.output_file;
+		NNMp.output_folder = p.output_folder;
 
 		NNMp.synchronize = p.synchronize;
 		NNMp.seed = p.seed;
@@ -55,13 +55,13 @@ void Simulator::run(po::variables_map &vm){
 void Simulator::setParameters(po::variables_map &vm){
 	// Required Options
 	cout << "[Required Options]" << endl;
-	parameters.output_file = vm["output"].as<string>();
+	parameters.output_folder = vm["output"].as<string>();
 	parameters.weights_file = vm["weights"].as<string>();
 	parameters.biases_file = vm["biases"].as<string>();
 
-	cout << "weights file: " << parameters.weights_file << endl;
-	cout << "biases file:  " << parameters.biases_file << endl;
-	cout << "output file:  " << parameters.output_file << endl << endl;
+	cout << "weights file:  " << parameters.weights_file << endl;
+	cout << "biases file:   " << parameters.biases_file << endl;
+	cout << "output folder: " << parameters.output_folder << endl << endl;
 
 	// Network Options
 	cout << "[Network Options]" << endl;

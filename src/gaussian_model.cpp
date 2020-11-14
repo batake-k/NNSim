@@ -20,8 +20,7 @@ GaussianModel::GaussianModel(const Parameters& p, const SharpeningParameters& sp
 }
 
 void GaussianModel::simulate(){
-	//output();
-	calcEnergy();
+	writeData(0);
 	Timer timer;
 
 	if(parameters.synchronize){
@@ -45,8 +44,7 @@ void GaussianModel::simulate(){
 				outputs_old[i] = outputs[i];
 			}
 			timer.elapsed("update", 2);
-			//output();
-			calcEnergy();
+			writeData(generation + 1);
 		}
 
 	}else{
@@ -67,7 +65,7 @@ void GaussianModel::simulate(){
 				outputs[id] = func(potentials[id]);
 			}
 			timer.elapsed("update", 2);
-			calcEnergy();
+			writeData(generation + 1);
 		}
 
 	}

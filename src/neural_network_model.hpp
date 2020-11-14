@@ -12,7 +12,7 @@ public:
 	typedef struct {
 		std::string weights_file;
 		std::string biases_file;
-		std::string output_file;
+		std::string output_folder;
 
 		bool synchronize;
 		uint32_t seed;
@@ -33,8 +33,10 @@ public:
 	virtual void simulate() {};
 
 protected:
-	void output();
-	void outputU();
+	void writeData(const uint32_t generation);
+	void writeOutputs(std::ofstream& ofs);
+	void writePotentials(std::ofstream& ofs);
+
 	double calcEnergy();
 
 	std::vector<float> potentials;

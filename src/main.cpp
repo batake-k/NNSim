@@ -21,7 +21,7 @@ namespace {
 		req_opt.add_options()
 			("weights,w", po::value<std::string>(), "neuron weights file")
 			("biases,b", po::value<std::string>(), "neuron biases file")
-			("output,o", po::value<std::string>(), "output file");
+			("output,o", po::value<std::string>(), "output folder");
 
 		n_opt.add_options()
 			("network_model,m", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")
