@@ -54,8 +54,8 @@ protected:
 
 private:
 	virtual void initNeurons() {};
-	virtual float func() {return 0;};
-	virtual float inverseFunc() {return 0;};
+	virtual float func(const float input) {return 0;};
+	virtual float inverseFunc(const float input) {return 0;};
 
 	void readWeights();
 	void readBiases();

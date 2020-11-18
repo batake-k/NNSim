@@ -5,11 +5,10 @@
 
 #include <iostream>
 
-#ifdef __linux__
+#if defined __linux__ || defined __APPLE__
 	#include<sys/stat.h>
-#elif _WIN32
+#elif defined _WIN32
 	#include<direct.h>
-#else
 #endif
 
 using namespace std;
@@ -55,7 +54,7 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	readWeights();
 	timer.elapsed("read weights file", 2);
 
-#ifdef __linux__
+#if defined __linux__ || defined __APPLE__
 	if(mkdir(parameters.output_folder.c_str(), 0775) != 0){
 		cerr << "[ERROR] failed to create directory" << endl;
 		exit(0);
@@ -65,7 +64,6 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 		cerr << "[ERROR] failed to create directory" << endl;
 		exit(0);
 	}
-#else
 #endif
 
 	num_neurons = biases.size();
