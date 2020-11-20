@@ -91,7 +91,7 @@ void GaussianModel::calculateT_epsilon(const uint32_t generation){
 
 	// 線形で減衰
 	float T_epsilon_candidate = annealing_parameters.T_epsilon * (1.0 - (float)generation / annealing_parameters.time_constant_T_epsilon);
-	annealing_parameters.current_T_epsilon = std::max(T_epsilon_candidate, (float)1e-6);
+	annealing_parameters.current_T_epsilon = std::max(T_epsilon_candidate, 0.0);
 }
 
 void GaussianModel::calculateT_mf(const uint32_t generation){
