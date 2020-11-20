@@ -87,24 +87,22 @@ void GaussianModel::initNeurons(){
 
 void GaussianModel::calculateT_epsilon(const uint32_t generation){
 	// D論
-	annealing_parameters.current_T_epsilon = annealing_parameters.T_epsilon / std::pow(1.0+(float)generation/annealing_parameters.time_constant_T_epsilon, 2);
+	//annealing_parameters.current_T_epsilon = annealing_parameters.T_epsilon / std::pow(1.0+(float)generation/annealing_parameters.time_constant_T_epsilon, 2);
 
-	/*
+	// 線形で減衰
 	float T_epsilon_candidate = annealing_parameters.T_epsilon * (1.0 - (float)generation / annealing_parameters.time_constant_T_epsilon);
 	annealing_parameters.current_T_epsilon = std::max(T_epsilon_candidate, (float)1e-6);
-	*/
 }
 
 void GaussianModel::calculateT_mf(const uint32_t generation){
 	// D論
-	sharpening_parameters.current_T_mf = sharpening_parameters.T_mf / (1.0 + (float)generation / sharpening_parameters.time_constant_T_mf);
-	sharpening_parameters.reciprocal_current_T_mf = 1.0 / sharpening_parameters.current_T_mf;
+	//sharpening_parameters.current_T_mf = sharpening_parameters.T_mf / (1.0 + (float)generation / sharpening_parameters.time_constant_T_mf);
+	//sharpening_parameters.reciprocal_current_T_mf = 1.0 / sharpening_parameters.current_T_mf;
 
-	/*
+	// 線形で減衰
 	float T_mf_candidate = sharpening_parameters.T_mf * (1.0 - (float)generation / sharpening_parameters.time_constant_T_mf);
 	sharpening_parameters.current_T_mf = std::max(T_mf_candidate, (float)1e-6);
 	sharpening_parameters.reciprocal_current_T_mf = 1.0/sharpening_parameters.current_T_mf;
-	*/
 }
 
 //logit
