@@ -60,6 +60,8 @@ private:
 	void readWeights();
 	void readBiases();
 
+	void binarization();
+
 	std::ofstream ofs;
 };
 

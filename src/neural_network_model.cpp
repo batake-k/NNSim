@@ -106,6 +106,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 	if(generation == parameters.generations){
 		ofstream ofs;
 		utils::fileOpen(ofs, parameters.output_folder + "/E", ios::out | ios::app);
+		binarization();
 		ofs << calcEnergy() << endl;
 		ofs.close();
 	}
@@ -138,6 +139,16 @@ void NeuralNetworkModel::writePotentials(ofstream& ofs){
 		}
 	}
 	ofs << endl;
+}
+
+void NeuralNetworkModel::binarization(){
+	for(uint32_t i=0; i<num_neurons; ++i){
+		if(outputs[i] >= 0.5){
+			outputs[i] = 1.0;
+		}else{
+			outputs[i] = 0.0;
+		}
+	}
 }
 
 double NeuralNetworkModel::calcEnergy(){
