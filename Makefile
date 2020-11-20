@@ -1,13 +1,13 @@
-MODE:=Release
-#Release or Debug
+MODE:=Experiment
+#Experiment or GUI
 
 CXX=g++
-CXX_FLAGS=-Wall -std=c++11 #-fopenmp
+CXX_FLAGS=-Wall -std=c++11 -O3 #-fopenmp
 
-ifeq ($(MODE),Release)
-	CXX_FLAGS += -O3
-else ifeq ($(MODE),Debug)
-	CXX_FLAGS += -g -DDEBUG -O3 #-O0 本来debugなら最適化レベルを下げる
+ifeq ($(MODE),Experiment)
+	CXX_FLAGS += -DEXP
+else ifeq ($(MODE),GUI)
+	CXX_FLAGS += -DGUI
 endif
 
 #C_SRC= \

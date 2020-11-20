@@ -56,15 +56,21 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	timer.elapsed("read weights file", 2);
 
 #ifdef __linux__
-	if(mkdir(parameters.output_folder.c_str(), 0775) != 0){
-		cerr << "[ERROR] failed to create directory" << endl;
-		exit(0);
-	}
+		bool make_directory = mkdir(parameters.output_folder.c_str(), 0755);
+	#ifdef GUI
+		if(make_directory != 0){
+			cerr << "[ERROR] failed to create directory" << endl;
+			exit(0);
+		}
+	#endif
 #elif _WIN32
-	if(_makedir(parameters.output_folder) != 0){
-		cerr << "[ERROR] failed to create directory" << endl;
-		exit(0);
-	}
+		bool make_directory = _makedir(parameters.output_folder);
+	#ifdef GUI
+		if(make_directory != 0){
+			cerr << "[ERROR] failed to create directory" << endl;
+			exit(0);
+		}
+	#endif
 #else
 #endif
 
@@ -84,15 +90,29 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 }
 
 void NeuralNetworkModel::writeData(const uint32_t generation){
+
+#ifdef GUI
+
 	ofstream ofs;
 	utils::fileOpen(ofs, parameters.output_folder + "/" + to_string(generation), ios::out);
-
 	ofs << calcEnergy() << endl << endl;
 
 	writeOutputs(ofs);
 	writePotentials(ofs);
 
 	ofs.close();
+
+#elif defined(EXP)
+
+	if(generation == parameters.generations){
+		ofstream ofs;
+		utils::fileOpen(ofs, parameters.output_folder + "/E", ios::out | ios::app);
+		ofs << calcEnergy() << endl;
+		ofs.close();
+	}
+
+#endif
+
 }
 
 void NeuralNetworkModel::writeOutputs(ofstream& ofs){

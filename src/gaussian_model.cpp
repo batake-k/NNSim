@@ -20,6 +20,7 @@ GaussianModel::GaussianModel(const Parameters& p, const SharpeningParameters& sp
 }
 
 void GaussianModel::simulate(){
+
 	writeData(0);
 	Timer timer;
 

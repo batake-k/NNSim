@@ -28,9 +28,9 @@ namespace {
 			("synchronize,s", po::value<bool>()->default_value(true), "syncronously update, true or false")
 			("inner_potential,i", po::value<bool>()->default_value(true), "have inner potential, true or false")
 			("random_seed,r", po::value<uint32_t>()->default_value(0), "random seed")
-			("generations,g", po::value<uint32_t>()->default_value(25), "number of generations")
-			("time_constant,t", po::value<uint32_t>()->default_value(2), "time constant")
-			("delta_t,d", po::value<float>()->default_value(0.8), "delta t");
+			("generations,g", po::value<uint32_t>()->default_value(50), "number of generations")
+			("time_constant,t", po::value<uint32_t>()->default_value(1), "time constant")
+			("delta_t,d", po::value<float>()->default_value(1.0), "delta t");
 
 		g_opt.add_options()
 			("T_mf", po::value<float>()->default_value(1.0), "[sharpening] T_mf")
