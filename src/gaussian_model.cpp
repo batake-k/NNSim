@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <cmath>
 
-#include <omp.h>
+#ifdef _OPENMP
+	#include <omp.h>
+#endif
 
 using namespace std;
 
@@ -28,16 +30,24 @@ void GaussianModel::simulate(){
 
 	if(parameters.synchronize){
 
+#ifdef _OPENMP
 		omp_set_num_threads(parameters.threads);
+#endif
 
+		std::normal_distribution<> dist;
+
+		#pragma omp parallel
 		for(uint32_t generation=0; generation<parameters.generations; ++generation ){
 
-			timer.restart();
-			calculateT_mf(generation);
-			calculateT_epsilon(generation);
-			std::normal_distribution<> dist = std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
+			#pragma omp single
+			{
+				timer.restart();
+				calculateT_mf(generation);
+				calculateT_epsilon(generation);
+				dist = std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
+			}
 
-			#pragma omp parallel for
+			#pragma omp for
 			for(uint32_t i=0; i<num_neurons; ++i){
 				float input_sum = 0;
 				for(const auto& w : weights[i]){
@@ -47,13 +57,18 @@ void GaussianModel::simulate(){
 				outputs[i] = func(potentials[i]);
 			}
 
-			#pragma omp parallel for
+			#pragma omp barrier
+
+			#pragma omp for
 			for(uint32_t i=0; i<num_neurons; ++i){
 				outputs_old[i] = outputs[i];
 			}
 
-			timer.elapsed("update", 2);
-			writeData(generation + 1);
+			#pragma omp single
+			{
+				timer.elapsed("update", 2);
+				writeData(generation + 1);
+			}
 		}
 
 	}else{
