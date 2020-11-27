@@ -2,17 +2,16 @@
 #define SIMULATOR_HPP
 
 #include <string>
-#include <fstream>
 
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
 
 class Simulator {
-
 public:
+
 	typedef struct {
-		std::string output_file;
+		std::string output_folder;
 		std::string weights_file;
 		std::string biases_file;
 
@@ -23,8 +22,14 @@ public:
 		uint32_t generations;
 		uint32_t time_constant;
 		float delta_t;
-		float base_potential;
-		float standard_deviation;
+
+		//Gaussian Sharpening Parameters
+		float T_mf;
+		uint32_t time_constant_T_mf;
+
+		//Gaussian Annealing Parameters
+		float T_epsilon;
+		uint32_t time_constant_T_epsilon;
 	}Parameters;
 
 	Simulator(){};
@@ -33,9 +38,10 @@ public:
 	void run(po::variables_map &vm);
 
 private:
-	Parameters parameters;
 
 	void setParameters(po::variables_map &vm);
+
+	Parameters parameters;
 };
 
 #endif

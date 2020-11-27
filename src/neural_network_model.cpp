@@ -5,6 +5,12 @@
 
 #include <iostream>
 
+#if defined __linux__ || defined __APPLE__
+	#include<sys/stat.h>
+#elif defined _WIN32
+	#include<direct.h>
+#endif
+
 using namespace std;
 
 void NeuralNetworkModel::readBiases(){
@@ -36,7 +42,7 @@ void NeuralNetworkModel::readWeights(){
 	ifs.close();
 }
 
-NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters(_parameters){
+NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 
 	//read bias file, and init biases
 	Timer timer;
@@ -48,7 +54,20 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 	readWeights();
 	timer.elapsed("read weights file", 2);
 
-	utils::fileOpen(ofs, parameters.output_file, ios::out);
+#ifdef GUI
+	#if defined __linux__ || defined __APPLE__
+		if(mkdir(parameters.output_folder.c_str(), 0755) != 0){
+			cerr << "[ERROR] failed to create directory" << endl;
+			exit(0);
+		}
+	#elif _WIN32
+		if(_makedir(parameters.output_folder) != 0){
+			cerr << "[ERROR] failed to create directory" << endl;
+			exit(0);
+		}
+	#else
+	#endif
+#endif
 
 	num_neurons = biases.size();
 
@@ -56,27 +75,43 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& _parameters):parameters
 	mt = mt19937(parameters.seed);
 	rand_int = uniform_int_distribution<>(0, num_neurons -1);
 
-	//calc reciprocal_time_constant and reciprocal_base_potential for update potentials
-	reciprocal_base_potential = 1.0 / parameters.base_potential;
+	//calc reciprocal_time_constant for update potentials
 	reciprocal_time_constant = 1.0 / parameters.time_constant;
 
-	//init potentials, neuron_outputs
-	timer.restart();
+	//resize data
 	potentials.resize(num_neurons);
 	outputs.resize(num_neurons);
 	outputs_old.resize(num_neurons);
-
-	uniform_real_distribution<> rand_real(-0.5, 0.5);
-	for(uint32_t i=0; i<num_neurons; ++i){
-		outputs[i] = 0.5 + 0.001 * rand_real(mt);
-		outputs_old[i] = outputs[i];
-		potentials[i] = inverseFunc(outputs[i]);
-	}
-	timer.elapsed("init neurons", 2);
 }
 
+void NeuralNetworkModel::writeData(const uint32_t generation){
 
-void NeuralNetworkModel::output(){
+#ifdef GUI
+
+	ofstream ofs;
+	utils::fileOpen(ofs, parameters.output_folder + "/" + to_string(generation), ios::out);
+	ofs << calcEnergy() << endl << endl;
+
+	writeOutputs(ofs);
+	writePotentials(ofs);
+
+	ofs.close();
+
+#elif defined(EXP)
+
+	if(generation == parameters.generations){
+		ofstream ofs;
+		utils::fileOpen(ofs, parameters.output_folder, ios::out | ios::app);
+		binarization();
+		ofs << calcEnergy() << endl;
+		ofs.close();
+	}
+
+#endif
+
+}
+
+void NeuralNetworkModel::writeOutputs(ofstream& ofs){
 	int N = sqrt(num_neurons);
 
 	for(uint32_t i=0; i<num_neurons; ++i){
@@ -89,7 +124,7 @@ void NeuralNetworkModel::output(){
 	ofs << endl;
 }
 
-void NeuralNetworkModel::outputU(){
+void NeuralNetworkModel::writePotentials(ofstream& ofs){
 	int N = sqrt(num_neurons);
 
 	for(uint32_t i=0; i<num_neurons; ++i){
@@ -102,81 +137,26 @@ void NeuralNetworkModel::outputU(){
 	ofs << endl;
 }
 
-bool NeuralNetworkModel::calcEnergyNQueen(){
+void NeuralNetworkModel::binarization(){
+	for(uint32_t i=0; i<num_neurons; ++i){
+		if(outputs[i] >= 0.5){
+			outputs[i] = 1.0;
+		}else{
+			outputs[i] = 0.0;
+		}
+	}
+}
 
-	int N = sqrt(num_neurons);
+double NeuralNetworkModel::calcEnergy(){
 	double E = 0;
 
-	for(int x=0; x<N; ++x){
-		double a = 0;
-		for(int y=0; y<N; ++y){
-			a += outputs[x * N + y];
+	for(uint32_t i=0; i<num_neurons; ++i){
+		for(const auto& w : weights[i]){
+			E -= 0.5 * outputs[i] * outputs[w.neuron_id] * w.weight;
 		}
-		E += (a - 1) * (a - 1);
+
+		E -= outputs[i] * biases[i];
 	}
 
-	for(int y=0; y<N; ++y){
-		double b = 0;
-		for(int x=0; x<N; ++x){
-			b += outputs[x * N + y];
-		}
-		E += (b - 1) * (b - 1);
-	}
-
-	for(int i=0; i <= 2*N-2; ++i){
-		for(int x=0; x<N; ++x){
-
-			int y = i - x;
-			if(y < 0 || y >= N){
-				continue;
-			}
-
-			for(int X=0; X<N; ++X){
-
-				int Y = i - X;
-				if(Y < 0 || Y >= N || x == X){
-					continue;
-				}
-				E += outputs[x * N + y] * outputs[X * N + Y];
-			}
-		}
-	}
-
-	for(int j=1-N; j <= N-1; ++j){
-		for(int x=0; x<N; ++x){
-
-			int y = j + x;
-			if(y < 0 || y >= N){
-				continue;
-			}
-
-			for(int X=0; X<N; ++X){
-
-				int Y = j + X;
-				if(Y < 0 || Y >= N || x == X){
-					continue;
-				}
-				E += outputs[x * N + y] * outputs[X * N + Y];
-			}
-		}
-	}
-
-	cout << E << endl;
-
-	if(E == 0){
-		return true;
-	}else{
-		return false;
-	}
-}
-
-//logit
-float NeuralNetworkModel::inverseFunc(const float input){
-	return log(input / (1.0 - input)) / reciprocal_base_potential;
-}
-
-//sigmoid
-float NeuralNetworkModel::func(const float input){
-	//return (std::tanh(input / base_potential) + 1) / 2;
-	return 1.0 / (1.0 + exp(- input * reciprocal_base_potential));
+	return E;
 }

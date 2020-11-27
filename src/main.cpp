@@ -15,25 +15,30 @@ namespace {
 	po::options_description DefineOption(){
 		po::options_description opt;
 		po::options_description req_opt("(Required)");
-		po::options_description opt_opt("(Optional)");
+		po::options_description n_opt("(Network Options)");
+		po::options_description g_opt("(Gaussian Machine Options)");
 
 		req_opt.add_options()
 			("weights,w", po::value<std::string>(), "neuron weights file")
 			("biases,b", po::value<std::string>(), "neuron biases file")
-			("output,o", po::value<std::string>(), "output file");
+			("output,o", po::value<std::string>(), "output folder");
 
-		opt_opt.add_options()
+		n_opt.add_options()
 			("network_model,m", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")
 			("synchronize,s", po::value<bool>()->default_value(true), "syncronously update, true or false")
 			("inner_potential,i", po::value<bool>()->default_value(true), "have inner potential, true or false")
 			("random_seed,r", po::value<uint32_t>()->default_value(0), "random seed")
-			("generations,g", po::value<uint32_t>()->default_value(100), "number of generations")
+			("generations,g", po::value<uint32_t>()->default_value(50), "number of generations")
 			("time_constant,t", po::value<uint32_t>()->default_value(1), "time constant")
-			("delta_t,d", po::value<float>()->default_value(0.01), "delta t")
-			("base_potential,B", po::value<float>()->default_value(0.01), "base potential in tanh")
-			("standard_deviation,S", po::value<float>()->default_value(0.1), "standard deviation for noise");
+			("delta_t,d", po::value<float>()->default_value(1.0), "delta t");
 
-		opt.add(req_opt).add(opt_opt);
+		g_opt.add_options()
+			("T_mf", po::value<float>()->default_value(1.0), "[sharpening] T_mf")
+			("time_constant_T_mf", po::value<uint32_t>()->default_value(3), "[sharpening] time constant T_mf")
+			("T_epsilon", po::value<float>()->default_value(0.003), "[annealing] T_epsilon")
+			("time_constant_T_epsilon", po::value<uint32_t>()->default_value(3), "[annealing] time constant T_epsilon");
+
+		opt.add(req_opt).add(n_opt).add(g_opt);
 		return opt;
 	}
 

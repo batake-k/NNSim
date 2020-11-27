@@ -12,15 +12,13 @@ public:
 	typedef struct {
 		std::string weights_file;
 		std::string biases_file;
-		std::string output_file;
+		std::string output_folder;
 
 		bool synchronize;
-		bool inner_potential;
 		uint32_t seed;
 		uint32_t generations;
 		uint32_t time_constant;
 		float delta_t;
-		float base_potential;
 	}Parameters;
 
 	typedef struct {
@@ -35,12 +33,11 @@ public:
 	virtual void simulate() {};
 
 protected:
-	float func(const float input);
-	float inverseFunc(const float input);
+	void writeData(const uint32_t generation);
+	void writeOutputs(std::ofstream& ofs);
+	void writePotentials(std::ofstream& ofs);
 
-	void output();
-	void outputU();
-	bool calcEnergyNQueen();
+	double calcEnergy();
 
 	std::vector<float> potentials;
 	std::vector<float> outputs;
@@ -54,11 +51,16 @@ protected:
 	Parameters parameters;
 	uint32_t num_neurons;
 	float reciprocal_time_constant;
-	float reciprocal_base_potential;
 
 private:
+	virtual void initNeurons() {};
+	virtual float func(const float input) {return 0;};
+	virtual float inverseFunc(const float input) {return 0;};
+
 	void readWeights();
 	void readBiases();
+
+	void binarization();
 
 	std::ofstream ofs;
 };
