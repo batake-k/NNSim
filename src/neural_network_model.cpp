@@ -54,23 +54,19 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	readWeights();
 	timer.elapsed("read weights file", 2);
 
-#if defined __linux__ || defined __APPLE__
-		bool make_directory = mkdir(parameters.output_folder.c_str(), 0755);
-	#ifdef GUI
-		if(make_directory != 0){
+#ifdef GUI
+	#if defined __linux__ || defined __APPLE__
+		if(mkdir(parameters.output_folder.c_str(), 0755) != 0){
 			cerr << "[ERROR] failed to create directory" << endl;
 			exit(0);
 		}
-	#endif
-#elif _WIN32
-		bool make_directory = _makedir(parameters.output_folder);
-	#ifdef GUI
-		if(make_directory != 0){
+	#elif _WIN32
+		if(_makedir(parameters.output_folder) != 0){
 			cerr << "[ERROR] failed to create directory" << endl;
 			exit(0);
 		}
+	#else
 	#endif
-#else
 #endif
 
 	num_neurons = biases.size();
@@ -105,7 +101,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 
 	if(generation == parameters.generations){
 		ofstream ofs;
-		utils::fileOpen(ofs, parameters.output_folder + "/E", ios::out | ios::app);
+		utils::fileOpen(ofs, parameters.output_folder, ios::out | ios::app);
 		binarization();
 		ofs << calcEnergy() << endl;
 		ofs.close();
