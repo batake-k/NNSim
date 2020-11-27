@@ -46,7 +46,7 @@ protected:
 	std::vector<float> biases;
 	std::vector<std::vector<Weight>> weights;
 
-	std::mt19937 mt;
+	std::vector<std::mt19937> mt;
 	std::uniform_int_distribution<> rand_int;
 
 	Parameters parameters;

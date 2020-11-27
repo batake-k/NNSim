@@ -72,7 +72,9 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	num_neurons = biases.size();
 
 	//set mt and rand_int for select random neuron
-	mt = mt19937(parameters.seed);
+	for(uint32_t i=0; i<parameters.threads; ++i){
+		mt.emplace_back(mt19937(parameters.seed + i));
+	}
 	rand_int = uniform_int_distribution<>(0, num_neurons -1);
 
 	//calc reciprocal_time_constant for update potentials
