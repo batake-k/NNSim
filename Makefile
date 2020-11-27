@@ -2,7 +2,7 @@ MODE:=Experiment
 #Experiment or GUI
 
 CXX=g++
-CXX_FLAGS=-Wall -std=c++11 -O3 #-fopenmp
+CXX_FLAGS=-Wall -std=c++11 -O3 -fopenmp
 
 ifeq ($(MODE),Experiment)
 	CXX_FLAGS += -DEXP
