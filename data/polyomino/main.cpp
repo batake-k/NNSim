@@ -12,14 +12,14 @@ using namespace std;
 float A,B,C,D,gamma;
 
 typedef struct{
-	float bias;
-	float gamma_bias;
+	float before_bias;
+	float after_bias;
 } Bias;
 
 typedef struct{
 	uint32_t neuron_id;
-	float weight;
-	float gamma_weight;
+	float before_weight;
+	float after_weight;
 } Weight;
 
 std::vector<std::string> split(const std::string &str, const char delim){
@@ -146,25 +146,23 @@ bool checkBubble(const vector<vector<int>>& board, const int cut_bubble_size){
 }
 
 Weight calcWeight(const vector<NEURON>& neurons, const uint32_t i, const uint32_t j, const int cut_bubble_size){
-	float temp = gamma - 1;
-
-	float weight = 0, gamma_weight;
+	float before_weight = 0, after_weight = 0;
 
 	if(neurons[i].getPieceNumber() == neurons[j].getPieceNumber()){
-		weight += - A;
+		before_weight += - A;
+		after_weight += - A;
 	}
 
-	weight += - B * CalcOverlap(neurons[i], neurons[j]);
+	before_weight += - B * CalcOverlap(neurons[i], neurons[j]);
+	after_weight += - B * CalcOverlap(neurons[i], neurons[j]);
 
 	if(checkBubble(neurons[i] + neurons[j], cut_bubble_size)){
-		weight += - C * gamma / temp;
-		gamma_weight += C / temp;
+		after_weight += - C ;
 	}
 
-	weight += - D / temp * countOverlapEdge(neurons[i], neurons[j]);
-	gamma_weight += D / temp * countOverlapEdge(neurons[i], neurons[j]);
+	before_weight += D * countOverlapEdge(neurons[i], neurons[j]);
 
-	Weight w = {j, weight, gamma_weight};
+	Weight w = {j, before_weight, after_weight};
 
 	return w;
 }
@@ -256,8 +254,9 @@ int main(int argc, char *argv[]){
 	vector<Bias> biases;
 
 	for(uint32_t i=0; i<neurons_size; ++i){
-		float b1 = 0.5 * A + 0.5 * B * pieces[neurons[i].getPieceNumber()].getSize();
-		float b2 = A + B * pieces[neurons[i].getPieceNumber()].getSize();
+		float ai = pieces[neurons[i].getPieceNumber()].getSize();
+		float b1 = gamma * A - 0.5 * A + gamma * B * ai - 0.5 * B * ai;
+		float b2 = 0.5 * A + 0.5 * B * ai;
 		Bias b = {b1, b2};
 		biases.emplace_back(b);
 	}
