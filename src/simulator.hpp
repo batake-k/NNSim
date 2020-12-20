@@ -20,6 +20,7 @@ public:
 		bool inner_potential;
 		uint32_t seed;
 		uint32_t generations;
+		uint32_t threads;
 		uint32_t time_constant;
 		float delta_t;
 

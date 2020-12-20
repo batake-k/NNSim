@@ -17,6 +17,7 @@ public:
 		bool synchronize;
 		uint32_t seed;
 		uint32_t generations;
+		uint32_t threads;
 		uint32_t time_constant;
 		float delta_t;
 	}Parameters;
@@ -45,7 +46,7 @@ protected:
 	std::vector<float> biases;
 	std::vector<std::vector<Weight>> weights;
 
-	std::mt19937 mt;
+	std::vector<std::mt19937> mt;
 	std::uniform_int_distribution<> rand_int;
 
 	Parameters parameters;

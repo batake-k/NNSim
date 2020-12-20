@@ -6,6 +6,10 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef _OPENMP
+	#include <omp.h>
+#endif
+
 using namespace std;
 
 GaussianModel::GaussianModel(const Parameters& p, const SharpeningParameters& sp, const AnnealingParameters& ap):
@@ -26,26 +30,43 @@ void GaussianModel::simulate(){
 
 	if(parameters.synchronize){
 
+#ifdef _OPENMP
+		omp_set_num_threads(parameters.threads);
+#endif
+
+		#pragma omp parallel
 		for(uint32_t generation=0; generation<parameters.generations; ++generation ){
-			timer.restart();
-			calculateT_mf(generation);
-			calculateT_epsilon(generation);
+
+			int id = omp_get_thread_num();
+
+			#pragma omp single
+			{
+				timer.restart();
+				calculateT_mf(generation);
+				calculateT_epsilon(generation);
+			}
 			std::normal_distribution<> dist = std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
 
+			#pragma omp for
 			for(uint32_t i=0; i<num_neurons; ++i){
 				float input_sum = 0;
 				for(const auto& w : weights[i]){
 					input_sum += outputs_old[w.neuron_id] * w.weight;
 				}
-				potentials[i] += parameters.delta_t * (- reciprocal_time_constant * potentials[i] + input_sum + biases[i] + dist(mt));
+				potentials[i] += parameters.delta_t * (- reciprocal_time_constant * potentials[i] + input_sum + biases[i] + dist(mt[id]));
 				outputs[i] = func(potentials[i]);
 			}
 
+			#pragma omp for
 			for(uint32_t i=0; i<num_neurons; ++i){
 				outputs_old[i] = outputs[i];
 			}
-			timer.elapsed("update", 2);
-			writeData(generation + 1);
+
+			#pragma omp single
+			{
+				timer.elapsed("update", 2);
+				writeData(generation + 1);
+			}
 		}
 
 	}else{
@@ -57,12 +78,12 @@ void GaussianModel::simulate(){
 			std::normal_distribution<> dist = std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
 
 			for(uint32_t i=0; i<num_neurons; ++i){
-				uint32_t id = rand_int(mt);
+				uint32_t id = rand_int(mt[0]);
 				float input_sum = 0;
 				for(const auto& w : weights[id]){
 					input_sum += outputs[w.neuron_id] * w.weight;
 				}
-				potentials[id] += parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + biases[id] + dist(mt));
+				potentials[id] += parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + biases[id] + dist(mt[0]));
 				outputs[id] = func(potentials[id]);
 			}
 			timer.elapsed("update", 2);
@@ -79,7 +100,7 @@ void GaussianModel::initNeurons(){
 
 	uniform_real_distribution<> rand_real(0, 2 * value);
 	for(uint32_t i=0; i<num_neurons; ++i){
-		outputs[i] = rand_real(mt);
+		outputs[i] = rand_real(mt[0]);
 		outputs_old[i] = outputs[i];
 		potentials[i] = inverseFunc(outputs[i]);
 	}

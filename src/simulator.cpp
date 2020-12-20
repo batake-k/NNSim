@@ -16,6 +16,7 @@ namespace{
 		NNMp.synchronize = p.synchronize;
 		NNMp.seed = p.seed;
 		NNMp.generations = p.generations;
+		NNMp.threads = p.threads;
 		NNMp.time_constant = p.time_constant;
 		NNMp.delta_t = p.delta_t;
 	}
@@ -90,7 +91,10 @@ void Simulator::setParameters(po::variables_map &vm){
 	cout << "random seed:     " << parameters.seed << endl;
 
 	parameters.generations = vm["generations"].as<uint32_t>();
-	cout << "generations:     " << parameters.generations << endl << endl;
+	cout << "generations:     " << parameters.generations << endl;
+
+	parameters.threads = vm["threads"].as<uint32_t>();
+	cout << "threads:         " << parameters.threads << endl << endl;
 
 	//Gaussian Sharpening Parameters
 	cout << "[Sharpening Parameters]" << endl;
