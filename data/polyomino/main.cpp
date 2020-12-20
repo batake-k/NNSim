@@ -9,12 +9,18 @@
 
 using namespace std;
 
-float A,B,C,D;
+float A,B,C,D,gamma;
+
+typedef struct{
+	float bias;
+	float gamma_bias;
+} Bias;
 
 typedef struct{
 	uint32_t neuron_id;
 	float weight;
-} W;
+	float gamma_weight;
+} Weight;
 
 std::vector<std::string> split(const std::string &str, const char delim){
 	std::vector<std::string> elems;
@@ -139,33 +145,35 @@ bool checkBubble(const vector<vector<int>>& board, const int cut_bubble_size){
 	return false;
 }
 
-float Weight(const vector<NEURON>& neurons, const uint32_t i, const uint32_t j, const int cut_bubble_size){
-	if(i == j){
-		return 0;
-	}
+Weight calcWeight(const vector<NEURON>& neurons, const uint32_t i, const uint32_t j, const int cut_bubble_size){
+	float temp = gamma - 1;
 
-	float weight = 0;
+	float weight = 0, gamma_weight;
 
 	if(neurons[i].getPieceNumber() == neurons[j].getPieceNumber()){
-		weight -= A;
+		weight += - A;
 	}
 
-	weight -= B * CalcOverlap(neurons[i], neurons[j]);
+	weight += - B * CalcOverlap(neurons[i], neurons[j]);
 
 	if(checkBubble(neurons[i] + neurons[j], cut_bubble_size)){
-		weight -= C;
+		weight += - C * gamma / temp;
+		gamma_weight += C / temp;
 	}
 
-	weight += D * countOverlapEdge(neurons[i], neurons[j]);
+	weight += - D / temp * countOverlapEdge(neurons[i], neurons[j]);
+	gamma_weight += D / temp * countOverlapEdge(neurons[i], neurons[j]);
 
-	return weight;
+	Weight w = {j, weight, gamma_weight};
+
+	return w;
 }
 
 
 int main(int argc, char *argv[]){
 
-	if(argc != 10){
-		cout << "./polyomino input_file output_file cut_bubble_size rotation_flag inversion_flag A B C D" << endl;
+	if(argc != 11){
+		cout << "./polyomino input_file output_file cut_bubble_size rotation_flag inversion_flag A B C D gamma" << endl;
 		exit(0);
 	}
 
@@ -178,6 +186,7 @@ int main(int argc, char *argv[]){
 	B = stof(argv[7]);
 	C = stof(argv[8]);
 	D = stof(argv[9]);
+	gamma = stof(argv[10]);
 
 	bool rotation, inversion;
 	if(_rotation == 1){
@@ -244,13 +253,16 @@ int main(int argc, char *argv[]){
 
 	// biases
 	ofstream ofs_biases(output_file + "_biases", ios::binary);
-	vector<float> biases;
+	vector<Bias> biases;
 
 	for(uint32_t i=0; i<neurons_size; ++i){
-		biases.emplace_back(0.5 * A + 0.5 * B * pieces[neurons[i].getPieceNumber()].getSize());
+		float b1 = 0.5 * A + 0.5 * B * pieces[neurons[i].getPieceNumber()].getSize();
+		float b2 = A + B * pieces[neurons[i].getPieceNumber()].getSize();
+		Bias b = {b1, b2};
+		biases.emplace_back(b);
 	}
 	ofs_biases.write((char*)&neurons_size, sizeof(uint32_t));
-	ofs_biases.write((char*)&biases[0], sizeof(float) * neurons_size);
+	ofs_biases.write((char*)&biases[0], sizeof(Bias) * neurons_size);
 	ofs_biases.close();
 
 	// weights
@@ -258,19 +270,20 @@ int main(int argc, char *argv[]){
 	ofs_weights.write((char*)&neurons_size, sizeof(uint32_t));
 
 	for(uint32_t i=0; i<neurons_size; ++i){
-		vector<W> Ws;
+		vector<Weight> Ws;
 
 		for(uint32_t j=0; j<neurons_size; ++j){
-			float weight = Weight(neurons, i, j, cut_bubble_size);
-			if(weight != 0){
-				W w = {j, weight};
-				Ws.emplace_back(w);
+			if(i == j){
+				continue;
 			}
+
+			Weight w = calcWeight(neurons, i, j, cut_bubble_size);
+			Ws.emplace_back(w);
 		}
 
 		uint32_t Ws_size = Ws.size();
 		ofs_weights.write((char*)&Ws_size, sizeof(uint32_t));
-		ofs_weights.write((char*)&Ws[0], sizeof(W) * Ws_size);
+		ofs_weights.write((char*)&Ws[0], sizeof(Weight) * Ws_size);
 	}
 
 	ofs_weights.close();
