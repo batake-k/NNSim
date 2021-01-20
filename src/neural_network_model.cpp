@@ -21,7 +21,7 @@ void NeuralNetworkModel::readBiases(){
 	ifs.read((char*)&size, sizeof(uint32_t));
 	biases.resize(size);
 
-	ifs.read((char*)&biases[0], sizeof(float)*size);
+	ifs.read((char*)&biases[0], sizeof(Bias)*size);
 	ifs.close();
 }
 
@@ -92,10 +92,10 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 
 	ofstream ofs;
 	utils::fileOpen(ofs, parameters.output_folder + "/" + to_string(generation), ios::out);
-	ofs << calcEnergy() << endl << endl;
+	ofs << calcEnergy(generation) << endl << endl;
 
 	writeOutputs(ofs);
-	writePotentials(ofs);
+	//writePotentials(ofs);
 
 	ofs.close();
 
@@ -105,7 +105,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 		ofstream ofs;
 		utils::fileOpen(ofs, parameters.output_folder, ios::out | ios::app);
 		binarization();
-		ofs << calcEnergy() << endl;
+		ofs << calcEnergy(generation) << endl;
 		ofs.close();
 	}
 
@@ -114,11 +114,20 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 }
 
 void NeuralNetworkModel::writeOutputs(ofstream& ofs){
-	int N = sqrt(num_neurons);
+	/*int N = sqrt(num_neurons);
 
 	for(uint32_t i=0; i<num_neurons; ++i){
 		if((i+1) % N == 0){
 			ofs << outputs[i] << endl;
+		}else{
+			ofs << outputs[i] << ",";
+		}
+	}
+	ofs << endl;*/
+
+	for(uint32_t i=0; i<num_neurons; ++i){
+		if(i == num_neurons -1){
+			ofs << outputs[i];
 		}else{
 			ofs << outputs[i] << ",";
 		}
@@ -149,15 +158,17 @@ void NeuralNetworkModel::binarization(){
 	}
 }
 
-double NeuralNetworkModel::calcEnergy(){
+double NeuralNetworkModel::calcEnergy(const uint32_t generation){
 	double E = 0;
 
 	for(uint32_t i=0; i<num_neurons; ++i){
 		for(const auto& w : weights[i]){
-			E -= 0.5 * outputs[i] * outputs[w.neuron_id] * w.weight;
+			float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
+			E -= 0.5 * outputs[i] * outputs[w.neuron_id] * weight;
 		}
 
-		E -= outputs[i] * biases[i];
+		float bias = biases[i].before_bias + (biases[i].after_bias - biases[i].before_bias) * generation / parameters.generations;
+		E -= outputs[i] * bias;
 	}
 
 	return E;

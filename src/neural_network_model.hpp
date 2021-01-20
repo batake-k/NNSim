@@ -23,8 +23,14 @@ public:
 	}Parameters;
 
 	typedef struct {
+		float before_bias;
+		float after_bias;
+	}Bias;
+
+	typedef struct {
 		uint32_t neuron_id;
-		float weight;
+		float before_weight;
+		float after_weight;
 	}Weight;
 
 	NeuralNetworkModel() {};
@@ -38,12 +44,12 @@ protected:
 	void writeOutputs(std::ofstream& ofs);
 	void writePotentials(std::ofstream& ofs);
 
-	double calcEnergy();
+	double calcEnergy(const uint32_t generation);
 
 	std::vector<float> potentials;
 	std::vector<float> outputs;
 	std::vector<float> outputs_old;
-	std::vector<float> biases;
+	std::vector<Bias> biases;
 	std::vector<std::vector<Weight>> weights;
 
 	std::vector<std::mt19937> mt;
