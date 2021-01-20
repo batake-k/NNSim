@@ -1,9 +1,14 @@
+/**
+ * 盤面へのポリオミノの置き方に対応するNeuronクラスについて記述
+ * @author Kazuki Takabatake
+ * @date 2020/12/20
+ */
 #include "neuron.hpp"
 
 using namespace std;
 
-void NEURON::Write(ofstream& ofs){
-	ofs << "piece: " << piece_number << endl;
+void Neuron::Write(ofstream& ofs){
+	ofs << piece_number << "," << size << "," << num_edges << endl;
 	for(const auto& vv : board){
 		for(const auto& v : vv){
 			ofs << v;
@@ -13,7 +18,17 @@ void NEURON::Write(ofstream& ofs){
 	ofs << endl;
 }
 
-int countOverlapEdge(const NEURON& i, const NEURON& j){
+/**
+ * 二つのポリオミノの置き方を重ねた際に重なる辺の数を計算
+ * @param i 一つ目のニューロン
+ * @param j 二つ目のニューロン
+ * @return 重なる辺の数
+ */
+int countOverlapEdge(const Neuron& i, const Neuron& j){
+	if(i.getPieceNumber() == j.getPieceNumber()){
+		return 0;
+	}
+
 	int count=0;
 
 	vector<vector<int>> bi(i.board);
@@ -52,7 +67,13 @@ int countOverlapEdge(const NEURON& i, const NEURON& j){
 	return count;
 }
 
-int CalcOverlap(const NEURON& i, const NEURON& j){
+/** 
+ * 二つのポリオミノの置き方を重ねた際に重なるマスの数を計算
+ * @param i 一つ目のニューロン
+ * @param j 二つ目のニューロン
+ * @return 重なるマスの数
+ */
+int calcOverlap(const Neuron& i, const Neuron& j){
 	vector<vector<int>> sum_board = i + j;
 
 	int overlap = 0;

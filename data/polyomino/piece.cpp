@@ -1,3 +1,8 @@
+/** 
+ * ポリオミノの情報を持つクラスを記述
+ * @author Kazuki Takabatake
+ * @date 2020/12/20
+ */
 #include "piece.hpp"
 
 #include <iostream>
@@ -7,6 +12,11 @@ using namespace std;
 
 namespace{
 
+	/**
+	 * 入力された状態を反転した状態を返す
+	 * @param before 反転前の状態
+	 * @return 反転後の状態
+	 */
 	vector<vector<int>> inverse(vector<vector<int>>& before){
 		vector<vector<int>> after(before.size(), vector<int>(before[0].size()));
 
@@ -19,6 +29,11 @@ namespace{
 		return after;
 	}
 
+	/**
+	 * 入力された状態を90度回転させた状態を返す
+	 * @param before 回転前の状態
+	 * @return 回転後の状態
+	 */
 	vector<vector<int>> rotate90(vector<vector<int>>& before){
 		vector<vector<int>> after(before[0].size(), vector<int>(before.size()));
 
@@ -33,6 +48,13 @@ namespace{
 
 }
 
+/**
+ * Pieceクラスのコンストラクタ
+ * @param default_state 初期状態、情報ファイルに記述されている状態
+ * @param piece_number ポリオミノのid
+ * @param rotation 回転を考慮するか
+ * @param inversion 反転を考慮するか
+ */
 Piece::Piece(vector<vector<int>>& default_state, int piece_number, bool rotation, bool inversion){
 	number = piece_number;
 
@@ -43,6 +65,29 @@ Piece::Piece(vector<vector<int>>& default_state, int piece_number, bool rotation
 		}
 	}
 	size = piece_size;
+
+	int number_of_edges = 0;
+	for(int x=0; x<default_state.size(); ++x){
+		for(int y=0; y<default_state[0].size(); ++y){
+			if(default_state[x][y] != 1){
+				continue;
+			}
+
+			if(x-1 < 0 || default_state[x-1][y] == 0){
+				++number_of_edges;
+			}
+			if(x+1 >= default_state.size() || default_state[x+1][y] == 0){
+				++number_of_edges;
+			}
+			if(y-1 < 0 || default_state[x][y-1] == 0){
+				++number_of_edges;
+			}
+			if(y+1 >= default_state[0].size() || default_state[x][y+1] == 0){
+				++number_of_edges;
+			}
+		}
+	}
+	num_edges = number_of_edges;
 
 	PieceState state(default_state);
 	states.emplace_back(state);
@@ -93,6 +138,7 @@ Piece::Piece(vector<vector<int>>& default_state, int piece_number, bool rotation
 	}
 }
 
+// 各状態を出力
 void PieceState::outputState() const{
 	for(const auto& vv : state){
 		for(const auto& v : vv){
@@ -103,6 +149,7 @@ void PieceState::outputState() const{
 	cout << endl;
 }
 
+// ピースの全状態を出力
 void Piece::outputStates() const{
 	cout << "Piece Number: " << number << endl;
 

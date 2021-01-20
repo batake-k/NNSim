@@ -1,8 +1,14 @@
+/**
+ * ポリオミノの情報を持つクラスを記述
+ * @author Kazuki Takabatake
+ * @date 2020/12/20
+ */
 #ifndef PIECE_HPP
 #define PIECE_HPP
 
 #include <vector>
 
+// ポリオミノの一つの状態に対応するクラス
 class PieceState{
 public:
 	PieceState() {};
@@ -32,11 +38,10 @@ public:
 	void outputState() const;
 
 private:
-	std::vector<std::vector<int>> state;
+	std::vector<std::vector<int>> state; // 状態
 };
 
-
-
+// 各ポリオミノに対応するクラス
 class Piece{
 public:
 	Piece() {};
@@ -47,13 +52,15 @@ public:
 	inline std::vector<PieceState> getStates() const { return states; };
 	inline int getNumber() const { return number; };
 	inline int getSize() const { return size; };
+	inline int getNumEdges() const { return num_edges; };
 
 	void outputStates() const;
 
 private:
-	std::vector<PieceState> states;
-	int number;
-	int size;
+	std::vector<PieceState> states; // 全状態の情報
+	int number; // ポリオミノのid
+	int size; // 大きさ
+	int num_edges; // 辺の数
 };
 
 #endif

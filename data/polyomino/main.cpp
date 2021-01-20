@@ -1,3 +1,9 @@
+/**
+ * メイン関数。ポリオミノパズルの情報ファイルを入力としてNN用の結合重み・バイアス値情報等を出力 
+ * @author Kazuki Takabatake
+ * @date 2020/12/20
+ */
+
 #include "neuron.hpp"
 #include "piece.hpp"
 
@@ -11,17 +17,25 @@ using namespace std;
 
 float A,B,C,D,gamma;
 
+// バイアス値。beforeがシミュレーション開始時、afterが終了時の値
 typedef struct{
 	float before_bias;
 	float after_bias;
 } Bias;
 
+// 結合重み。
 typedef struct{
 	uint32_t neuron_id;
 	float before_weight;
 	float after_weight;
 } Weight;
 
+/**
+ * 文字列分割関数
+ * @param str 分割前文字列
+ * @param delim 分割文字
+ * @return 分割された文字列のvector
+ */
 std::vector<std::string> split(const std::string &str, const char delim){
 	std::vector<std::string> elems;
 	std::string item;
@@ -38,7 +52,14 @@ std::vector<std::string> split(const std::string &str, const char delim){
 	return elems;
 }
 
-
+/**
+ * 入力ファイルから、盤面と各ピース（ポリオミノ）の情報を読み込む
+ * @param ifs 入力ファイルストリーム
+ * @param board 盤面
+ * @param pieces 全ピース
+ * @param rotation 回転フラグ
+ * @param inversion 反転フラグ
+ */
 void Read(ifstream& ifs, vector<vector<int>>& board, vector<Piece>& pieces, bool rotation, bool inversion){
 	string line;
 
@@ -76,7 +97,14 @@ void Read(ifstream& ifs, vector<vector<int>>& board, vector<Piece>& pieces, bool
 	}
 }
 
-
+/**
+ * 盤面、ピース、位置からニューロンになるか判定し、盤面にピースを置く
+ * @param board 盤面
+ * @param piece ピース
+ * @param x ピースを置くx座標
+ * @param y ピースを置くy座標
+ * @return ピースがおける場合はtrue,置けない場合はfalse
+ */
 bool generateNeuronBoard(vector<vector<int>>& board, vector<vector<int>>& piece, int x, int y){
 	for(int i=0; i<piece.size(); ++i){
 		for(int j=0; j<piece[0].size(); ++j){
@@ -94,7 +122,13 @@ bool generateNeuronBoard(vector<vector<int>>& board, vector<vector<int>>& piece,
 	return true;
 }
 
-
+/**
+ * 指定座標が盤面上で、かつピースが存在するか判定
+ * @param board 盤面
+ * @param x 指定するx座標
+ * @param y 指定するy座標
+ * @return ピースが存在する座標であればtrue,そうでなければfalse
+ */
 bool isEmpty(vector<vector<int>>& board, int x, int y){
 	if(x < 0 || x >= board.size() || y < 0 || y >= board[0].size()){
 
@@ -105,7 +139,12 @@ bool isEmpty(vector<vector<int>>& board, int x, int y){
 	return false;
 }
 
-
+/**
+ * 盤面にバブル（指定数以下のピースや壁に囲まれた空間）が存在するかどうか判定
+ * @param board 盤面
+ * @param but_bubble_size 空間がこの値以下であればバブルと判定
+ * @return バブルが存在する場合はtrue,存在しない場合はfalse
+ */
 bool checkBubble(const vector<vector<int>>& board, const int cut_bubble_size){
 	vector<vector<int>> check_board(board);
 
@@ -145,7 +184,15 @@ bool checkBubble(const vector<vector<int>>& board, const int cut_bubble_size){
 	return false;
 }
 
-Weight calcWeight(const vector<NEURON>& neurons, const uint32_t i, const uint32_t j, const int cut_bubble_size){
+/**
+ * ニューロンiとjの間の結合重みを計算
+ * @param neurons ニューロン集合
+ * @param i ニューロンiの番号
+ * @param j ニューロンjの番号
+ * @param cut_bubble_size 空間のサイズがこの値以下であればバブルと判定
+ * @return 結合重み
+ */
+Weight calcWeight(const vector<Neuron>& neurons, const uint32_t i, const uint32_t j, const int cut_bubble_size){
 	float before_weight = 0, after_weight = 0;
 
 	if(neurons[i].getPieceNumber() == neurons[j].getPieceNumber()){
@@ -153,33 +200,36 @@ Weight calcWeight(const vector<NEURON>& neurons, const uint32_t i, const uint32_
 		after_weight += - A;
 	}
 
-	before_weight += - B * CalcOverlap(neurons[i], neurons[j]);
-	after_weight += - B * CalcOverlap(neurons[i], neurons[j]);
+	before_weight += - B * calcOverlap(neurons[i], neurons[j]);
+	after_weight += - B * calcOverlap(neurons[i], neurons[j]);
 
 	if(checkBubble(neurons[i] + neurons[j], cut_bubble_size)){
 		after_weight += - C ;
+		//TODO バブル項を一定にする設定
+		before_weight += -C ;
 	}
 
-	before_weight += D * countOverlapEdge(neurons[i], neurons[j]);
+	float ave_num_edges = (float)(neurons[i].getNumEdges() + neurons[j].getNumEdges()) / 2;
+	before_weight += D * countOverlapEdge(neurons[i], neurons[j]) / ave_num_edges;
 
 	Weight w = {j, before_weight, after_weight};
 
 	return w;
 }
 
-
+// メイン関数
 int main(int argc, char *argv[]){
 
 	if(argc != 11){
-		cout << "./polyomino input_file output_file cut_bubble_size rotation_flag inversion_flag A B C D gamma" << endl;
+		cout << "./polyomino [input_file] [output_file] [cut_bubble_size] [rotation_flag] [inversion_flag] [A] [B] [C] [D] [gamma]" << endl;
 		exit(0);
 	}
 
 	string input_file = argv[1];
 	string output_file = argv[2];
-	int cut_bubble_size = stoi(argv[3]);
-	int _rotation = stoi(argv[4]);
-	int _inversion = stoi(argv[5]);
+	int cut_bubble_size = stoi(argv[3]); // 空間のサイズがこの値以下であればバブルと判定
+	int _rotation = stoi(argv[4]); // 回転を考慮するか
+	int _inversion = stoi(argv[5]); // 反転を考慮するか
 	A = stof(argv[6]);
 	B = stof(argv[7]);
 	C = stof(argv[8]);
@@ -217,7 +267,7 @@ int main(int argc, char *argv[]){
 		exit(0);
 	}
 
-	vector<NEURON> neurons;
+	vector<Neuron> neurons;
 
 	for(int i=0; i<pieces.size(); ++i){
 		for(const auto& piece_state : pieces[i].getStates()){
@@ -231,7 +281,7 @@ int main(int argc, char *argv[]){
 
 						bool has_bubble = checkBubble(current_board, cut_bubble_size);
 						if(!has_bubble){
-							NEURON neuron(current_board, i);
+							Neuron neuron(current_board, i, pieces[i].getSize(), pieces[i].getNumEdges());
 							neurons.emplace_back(neuron);
 						}
 					}
@@ -254,8 +304,8 @@ int main(int argc, char *argv[]){
 	vector<Bias> biases;
 
 	for(uint32_t i=0; i<neurons_size; ++i){
-		float ai = pieces[neurons[i].getPieceNumber()].getSize();
-		float b1 = gamma * A - 0.5 * A + gamma * B * ai - 0.5 * B * ai;
+		float ai = neurons[i].getSize();
+		float b1 = (gamma - 0.5) * A + (gamma - 0.5) * B * ai;
 		float b2 = 0.5 * A + 0.5 * B * ai;
 		Bias b = {b1, b2};
 		biases.emplace_back(b);
