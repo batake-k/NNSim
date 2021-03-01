@@ -12,10 +12,11 @@
 #include <string>
 #include <fstream>
 #include <utility>
+#include <algorithm>
 
 using namespace std;
 
-float A,B,C,D,gamma;
+float A,B,C,D,_gamma;
 
 // バイアス値。beforeがシミュレーション開始時、afterが終了時の値
 typedef struct{
@@ -192,7 +193,7 @@ bool checkBubble(const vector<vector<int>>& board, const int cut_bubble_size){
  * @param cut_bubble_size 空間のサイズがこの値以下であればバブルと判定
  * @return 結合重み
  */
-Weight calcWeight(const vector<Neuron>& neurons, const uint32_t i, const uint32_t j, const int cut_bubble_size){
+Weight calcWeight(const vector<Neuron>& neurons, const uint32_t i, const uint32_t j, const int cut_bubble_size, const float threshold_D){
 	float before_weight = 0, after_weight = 0;
 
 	if(neurons[i].getPieceNumber() == neurons[j].getPieceNumber()){
@@ -210,18 +211,75 @@ Weight calcWeight(const vector<Neuron>& neurons, const uint32_t i, const uint32_
 	}
 
 	float ave_num_edges = (float)(neurons[i].getNumEdges() + neurons[j].getNumEdges()) / 2;
-	before_weight += D * countOverlapEdge(neurons[i], neurons[j]) / ave_num_edges;
+	float overlap_edges_by_ave = (float)countOverlapEdge(neurons[i], neurons[j]) / ave_num_edges;
+
+	if(overlap_edges_by_ave >= threshold_D){
+		before_weight += D * overlap_edges_by_ave;
+	}
 
 	Weight w = {j, before_weight, after_weight};
 
 	return w;
 }
 
+
+float calcThresholdOverlapEdge(const vector<Neuron>& neurons, const float Dper){
+	vector<float> overlap_edges_by_ave;
+
+	for(const auto& neuron1 : neurons){
+		for(const auto& neuron2 : neurons){
+			float ave_num_edges = (float)(neuron1.getNumEdges() + neuron2.getNumEdges()) / 2;
+			int overlap_edge = countOverlapEdge(neuron1, neuron2);
+
+			if(overlap_edge > 0){
+				overlap_edges_by_ave.emplace_back((float)overlap_edge / ave_num_edges);
+			}
+		}
+	}
+
+	sort(overlap_edges_by_ave.begin(), overlap_edges_by_ave.end(), std::greater<float>());
+
+	int index = Dper * overlap_edges_by_ave.size() -1;
+	if(index <= 0 || index >= overlap_edges_by_ave.size()){
+		exit(1);
+	}
+	cout << "D threshold: " << overlap_edges_by_ave[index] << endl;
+	return overlap_edges_by_ave[index];
+}
+
+void test(const vector<Neuron>& neurons){
+	vector<int> o_es;
+	vector<float> o_es_b_a;
+
+	for(const auto& neuron1 : neurons){
+		for(const auto& neuron2 : neurons){
+			int o_e = countOverlapEdge(neuron1, neuron2);
+
+			if(o_e > 0){
+				o_es.emplace_back(o_e);
+				float ave_num_edges = (float)(neuron1.getNumEdges() + neuron2.getNumEdges()) / 2;
+				o_es_b_a.emplace_back((float)o_e / ave_num_edges);
+			}
+		}
+	}
+
+	ofstream o_es_ofs("overlap_edges.txt");
+	ofstream o_es_b_a_ofs("overlap_edges_by_ave.txt");
+
+	for(const auto& e : o_es){
+		o_es_ofs << e << endl;
+	}
+
+	for(const auto& e : o_es_b_a){
+		o_es_b_a_ofs << e << endl;
+	}
+}
+
 // メイン関数
 int main(int argc, char *argv[]){
 
-	if(argc != 11){
-		cout << "./polyomino [input_file] [output_file] [cut_bubble_size] [rotation_flag] [inversion_flag] [A] [B] [C] [D] [gamma]" << endl;
+	if(argc != 12){
+		cout << "./polyomino [input_file] [output_file] [cut_bubble_size] [rotation_flag] [inversion_flag] [A] [B] [C] [D] [gamma] [D percent]" << endl;
 		exit(0);
 	}
 
@@ -234,7 +292,8 @@ int main(int argc, char *argv[]){
 	B = stof(argv[7]);
 	C = stof(argv[8]);
 	D = stof(argv[9]);
-	gamma = stof(argv[10]);
+	_gamma = stof(argv[10]);
+	float Dper = stof(argv[11]);
 
 	bool rotation, inversion;
 	if(_rotation == 1){
@@ -267,6 +326,9 @@ int main(int argc, char *argv[]){
 		exit(0);
 	}
 
+	vector<int> Pms(pieces.size(), 0);
+	vector<int> Lns(board.size() * board[0].size(), 0);
+
 	vector<Neuron> neurons;
 
 	for(int i=0; i<pieces.size(); ++i){
@@ -281,6 +343,17 @@ int main(int argc, char *argv[]){
 
 						bool has_bubble = checkBubble(current_board, cut_bubble_size);
 						if(!has_bubble){
+
+							++Pms[pieces[i].getNumber()];
+
+							for(int x2=0; x2<current_board.size(); ++x2){
+								for(int y2=0; y2<current_board[0].size(); ++y2){
+									if(current_board[x2][y2] == 1){
+										++Lns[x2*current_board[0].size() + y2];
+									}
+								}
+							}
+
 							Neuron neuron(current_board, i, pieces[i].getSize(), pieces[i].getNumEdges());
 							neurons.emplace_back(neuron);
 						}
@@ -290,6 +363,27 @@ int main(int argc, char *argv[]){
 
 		}
 	}
+
+	float Pm_ave = 0;
+	cout << "Pm" << endl;
+	for(const auto& pm : Pms){
+		cout << pm << endl;
+		Pm_ave += pm;
+	}
+	Pm_ave /= Pms.size();
+	cout << "Pm average: " << Pm_ave << endl;
+
+	float Ln_ave = 0;
+	cout << "Ln" << endl;
+	for(int x=0; x<board.size(); ++x){
+		for(int y=0; y<board[0].size(); ++y){
+			cout << Lns[x*board[0].size() + y] << ",";
+			Ln_ave += Lns[x*board[0].size() + y];
+		}
+		cout << endl;
+	}
+	Ln_ave /= Lns.size();
+	cout << "Ln average: " << Ln_ave << endl;
 
 	ofstream ofs_info(output_file + "_info");
 	for(auto& n : neurons){
@@ -305,7 +399,26 @@ int main(int argc, char *argv[]){
 
 	for(uint32_t i=0; i<neurons_size; ++i){
 		float ai = neurons[i].getSize();
-		float b1 = (gamma - 0.5) * A + (gamma - 0.5) * B * ai;
+
+		float temp = 0;
+		for(int x=0; x<neurons[i].board.size(); ++x){
+			for(int y=0; y<neurons[i].board[0].size(); ++y){
+				if(neurons[i].board[x][y] == 1){
+					temp += Lns[x * neurons[i].board[0].size() + y];
+				}
+			}
+		}
+		temp /= Ln_ave;
+
+		if(i < 5){
+			cout << "temp: " << temp << endl;
+		}
+
+		//float b1 = ((float)Pms[neurons[i].getPieceNumber()] / Pm_ave + 0.5) * A + (temp + 0.5 * ai) * B;
+		//float aa = alpha * (float)Pms[neurons[i].getPieceNumber()] / Pm_ave - alpha;
+		//float b1 = (aa + 0.5) * A + (gamma - 0.5) * B * ai;
+		//float b1 = (gamma - 0.5) * A + (temp - 0.5 * ai) * B;
+		float b1 = (_gamma - 0.5) * A + (_gamma - 0.5) * B * ai;
 		float b2 = 0.5 * A + 0.5 * B * ai;
 		Bias b = {b1, b2};
 		biases.emplace_back(b);
@@ -313,6 +426,8 @@ int main(int argc, char *argv[]){
 	ofs_biases.write((char*)&neurons_size, sizeof(uint32_t));
 	ofs_biases.write((char*)&biases[0], sizeof(Bias) * neurons_size);
 	ofs_biases.close();
+
+	float threshold_D = calcThresholdOverlapEdge(neurons, Dper);
 
 	// weights
 	ofstream ofs_weights(output_file + "_weights", ios::binary);
@@ -326,7 +441,7 @@ int main(int argc, char *argv[]){
 				continue;
 			}
 
-			Weight w = calcWeight(neurons, i, j, cut_bubble_size);
+			Weight w = calcWeight(neurons, i, j, cut_bubble_size, threshold_D);
 			Ws.emplace_back(w);
 		}
 

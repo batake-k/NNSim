@@ -95,7 +95,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 	ofs << calcEnergy(generation) << endl << endl;
 
 	writeOutputs(ofs);
-	//writePotentials(ofs);
+	writePotentials(ofs);
 
 	ofs.close();
 
@@ -136,11 +136,9 @@ void NeuralNetworkModel::writeOutputs(ofstream& ofs){
 }
 
 void NeuralNetworkModel::writePotentials(ofstream& ofs){
-	int N = sqrt(num_neurons);
-
 	for(uint32_t i=0; i<num_neurons; ++i){
-		if((i+1) % N == 0){
-			ofs << potentials[i] << endl;
+		if(i == num_neurons -1){
+			ofs << potentials[i];
 		}else{
 			ofs << potentials[i] << ",";
 		}
