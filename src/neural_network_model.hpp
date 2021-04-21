@@ -14,6 +14,8 @@ public:
 		std::string biases_file;
 		std::string output_folder;
 
+		std::string hex_info_file;
+
 		bool synchronize;
 		uint32_t seed;
 		uint32_t generations;
@@ -68,7 +70,6 @@ private:
 	void readBiases();
 
 	void binarization();
-	bool isGoalHex();
 
 	std::ofstream ofs;
 };

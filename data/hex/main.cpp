@@ -310,7 +310,7 @@ int main(int argc, char *argv[]){
 
 	// info
 	ofstream ofs_info(output_file + "_info");
-	ofs_info << pieces.size() << "," << neurons.size() << endl << endl;
+	ofs_info << pieces.size() << "," << neurons.size() << "," << board.size() << endl << endl;
 
 	ofs_info << "-1" << endl;
 	ofs_info << sur_hexs.size() << endl;

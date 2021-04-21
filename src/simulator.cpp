@@ -12,6 +12,7 @@ namespace{
 		NNMp.weights_file = p.weights_file;
 		NNMp.biases_file = p.biases_file;
 		NNMp.output_folder = p.output_folder;
+		NNMp.hex_info_file = p.hex_info_file;
 
 		NNMp.synchronize = p.synchronize;
 		NNMp.seed = p.seed;
@@ -59,6 +60,8 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.output_folder = vm["output"].as<string>();
 	parameters.weights_file = vm["weights"].as<string>();
 	parameters.biases_file = vm["biases"].as<string>();
+
+	parameters.hex_info_file = vm["hex_info"].as<string>();
 
 	cout << "weights file:  " << parameters.weights_file << endl;
 	cout << "biases file:   " << parameters.biases_file << endl;

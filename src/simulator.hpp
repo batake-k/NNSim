@@ -15,6 +15,8 @@ public:
 		std::string weights_file;
 		std::string biases_file;
 
+		std::string hex_info_file;
+
 		char model;
 		bool synchronize;
 		bool inner_potential;
