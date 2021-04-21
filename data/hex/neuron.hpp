@@ -25,6 +25,9 @@ public:
 	int getSize() const {
 		return hexs.size();
 	}
+	int getPieceId() const {
+		return piece_id;
+	}
 	std::vector<Hex> getHexs() const {
 		return hexs;
 	}
