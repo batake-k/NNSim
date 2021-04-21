@@ -105,7 +105,22 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 		ofstream ofs;
 		utils::fileOpen(ofs, parameters.output_folder, ios::out | ios::app);
 		binarization();
-		ofs << calcEnergy(generation) << endl;
+		ofs << calcEnergy(generation) << ",";
+		if(isGoalHex()){
+			ofs << "1";
+		}else{
+			ofs << "0";
+		}
+
+		int _count = 0;
+		for(const auto e : outputs){
+			if(e >= 0.5){
+				++_count;
+			}
+		}
+
+		ofs << "," << _count << endl;
+
 		ofs.close();
 	}
 
@@ -154,6 +169,70 @@ void NeuralNetworkModel::binarization(){
 			outputs[i] = 0.0;
 		}
 	}
+}
+
+bool NeuralNetworkModel::isGoalHex(){
+	double E = 0;
+
+	for(uint32_t i=0; i<num_neurons; ++i){
+		for(const auto& w : weights[i]){
+			E -= 0.5 * outputs[i] * outputs[w.neuron_id] * w.after_weight;
+		}
+	}
+
+	if(E != 0){
+		return false;
+	}
+
+	int tile = 0;
+
+	for(uint32_t i=0; i<num_neurons; ++i){
+		if(outputs[i] == 1){
+			if(i < 84){
+				tile += 3;
+			}else if(i < 172){
+				tile += 4;
+			}else if(i < 241){
+				tile += 5;
+			}else if(i < 274){
+				tile += 6;
+			}else if(i < 293){
+				tile += 7;
+			}else{
+			}
+		}
+	}
+
+	if(tile == 34){
+		return true;
+	}else{
+		return false;
+	}
+
+	/*
+	for(uint32_t i=0; i<num_neurons; ++i){
+		if(outputs[i] == 1){
+			if(i < 264){
+				tile += 3;
+			}else if(i < 728){
+				tile += 4;
+			}else if(i < 1154){
+				tile += 5;
+			}else if(i < 1497){
+				tile += 6;
+			}else if(i < 1683){
+				tile += 7;
+			}else{
+			}
+		}
+	}
+
+	if(tile == 57){
+		return true;
+	}else{
+		return false;
+	}
+	*/
 }
 
 double NeuralNetworkModel::calcEnergy(const uint32_t generation){

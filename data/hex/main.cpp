@@ -194,6 +194,7 @@ Weight calcWeight(const vector<Hex> &board, const vector<Neuron> &neurons, const
 
 	// D
 	before_weight += D * calcConnectEdge(neurons[i], neurons[j]);
+	after_weight += D * calcConnectEdge(neurons[i], neurons[j]);
 
 	Weight w = {j, before_weight, after_weight};
 
@@ -220,8 +221,8 @@ int calcConnectWall(const vector<Hex> &hexs, const vector<Hex> &walls){
 
 int main(int argc, char *argv[]){
 
-	if(argc != 7){
-		cout << "./hex [input_file] [output_file] [cut_bubble_size] [B] [C] [D]" << endl;
+	if(argc != 8){
+		cout << "./hex [input_file] [output_file] [cut_bubble_size] [B] [C] [D] [penalty]" << endl;
 		exit(0);
 	}
 
@@ -233,6 +234,7 @@ int main(int argc, char *argv[]){
 	B = stof(argv[4]);
 	C = stof(argv[5]);
 	D = stof(argv[6]);
+	float penalty = stof(argv[7]);
 
 	vector<Hex> board;
 	vector<Piece> pieces;
@@ -275,10 +277,10 @@ int main(int argc, char *argv[]){
 				if(canBeNeuron && checkBubble(board, new_state, cut_bubble_size)){
 					canBeNeuron = false;
 					
-					cout << "has bubble with single piece" << endl;
+					/*cout << "has bubble with single piece" << endl;
 					for(const auto& s : new_state){
 						s.write();
-					}
+					}*/
 					
 				}
 
@@ -328,6 +330,8 @@ int main(int argc, char *argv[]){
 	ofstream ofs_biases(output_file + "_biases", ios::binary);
 	vector<Bias> biases;
 
+	cout << "biases:" << endl;
+
 	for(uint32_t i = 0; i<neurons_size; ++i){
 		// B
 		vector<Hex> hexs = neurons[i].getHexs();
@@ -341,8 +345,35 @@ int main(int argc, char *argv[]){
 		float b2 = 0.5 * B * pn;
 
 		// D wall
-		int hi = calcConnectWall(hexs, sur_hexs);
-		b1 += D * hi;
+		//int hi = calcConnectWall(hexs, sur_hexs);
+		//b1 += D * hi;
+
+		//b1 -= penalty / neurons[i].getSize();
+		//b2 -= penalty / neurons[i].getSize();
+
+		b1 -= penalty;
+		b2 -= penalty;
+
+		/*
+		if(neurons[i].getSize() == 3){
+			b1 = 0.1;
+			b2 = 0.1;
+		}else if(neurons[i].getSize() == 4){
+			b1 = 0.2;
+			b2 = 0.2;
+		}else if(neurons[i].getSize() == 5){
+			b1 = 0.4;
+			b2 = 0.4;
+		}else if(neurons[i].getSize() == 6){
+			b1 = 0.8;
+			b2 = 0.8;
+		}else{
+			b1 = 1.6;
+			b2 = 1.6;
+		}
+		*/
+
+		cout << neurons[i].getPieceId() << "\t" << b1 << "\t" << b2 << endl;
 
 		Bias b = {b1, b2};
 		biases.emplace_back(b);

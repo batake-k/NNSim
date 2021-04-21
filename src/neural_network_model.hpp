@@ -68,6 +68,7 @@ private:
 	void readBiases();
 
 	void binarization();
+	bool isGoalHex();
 
 	std::ofstream ofs;
 };
