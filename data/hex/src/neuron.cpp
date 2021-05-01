@@ -8,7 +8,7 @@ void Neuron::write(ofstream &ofs) const {
 	ofs << piece_id << endl;
 	ofs << hexs.size() << endl;
 	for(const auto& h : hexs){
-		h.write(ofs);
+		ofs << h.getStatus() << endl;
 	}
 	ofs << endl;
 }

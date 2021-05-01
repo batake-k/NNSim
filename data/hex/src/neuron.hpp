@@ -10,27 +10,20 @@
 #include "hex.hpp"
 
 #include <vector>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 class Neuron {
 public:
+	Neuron(std::vector<Hex> &_hexs, int _piece_id):hexs(_hexs),piece_id(_piece_id) {};
 	Neuron() {};
 	~Neuron() {};
 
-	Neuron(std::vector<Hex> &_hexs, int _piece_id)
-		:hexs(_hexs),piece_id(_piece_id) {};
-
 	void write(std::ofstream &ofs) const;
-	int getSize() const {
-		return hexs.size();
-	}
-	int getPieceId() const {
-		return piece_id;
-	}
-	std::vector<Hex> getHexs() const {
-		return hexs;
-	}
+
+	int getSize() const { return hexs.size(); }
+	int getPieceId() const { return piece_id; }
+	std::vector<Hex> getHexs() const { return hexs; }
 
 private:
 	std::vector<Hex> hexs;
@@ -38,8 +31,7 @@ private:
 };
 
 int calcOverlap(const Neuron& neuron_i, const Neuron& neuron_j);
-int calcOverlapPoint(const Neuron& neuron_i, const Neuron& neuron_j);
-
 int calcConnectEdge(const Neuron& neuron_i, const Neuron& neuron_j);
+int calcOverlapPoint(const Neuron& neuron_i, const Neuron& neuron_j);
 
 #endif
