@@ -39,6 +39,7 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
   utils::fileOpen(ifs, parameters.input_path, ios::binary);
 
   ifs.read((char*)&problem_type, sizeof(int));
+  cout << "problem type: " << problem_type << endl;
 
 	//read bias file, and init biases
 	Timer timer;
@@ -53,7 +54,7 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
   if(problem_type == 0){
     
   }else if(problem_type == 1){
-    
+    polyomino = Polyomino(ifs);
   }else if(problem_type == 2){
     hex = Hex(ifs);
   }
@@ -117,7 +118,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
     if(problem_type == 0){
       ofs << endl;
     }else if(problem_type == 1){
-      ofs << endl;
+      ofs << polyomino.getGoalStatus(outputs) << endl;
     }else if(problem_type == 2){
       ofs << hex.getGoalStatus(outputs) << endl;
     }

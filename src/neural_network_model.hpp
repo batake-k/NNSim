@@ -2,6 +2,7 @@
 #define NEURAL_NETWORK_MODEL_HPP
 
 #include "for_problems/hex.hpp"
+#include "for_problems/polyomino.hpp"
 
 #include <vector>
 #include <string>
@@ -72,6 +73,7 @@ private:
 
   int problem_type;
 	Hex hex;
+  Polyomino polyomino;
 };
 
 #endif

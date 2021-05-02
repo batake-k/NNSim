@@ -18,6 +18,7 @@ CPP_SRC=./src/main.cpp \
 	./src/simulator.cpp \
   ./src/utils.cpp \
   ./src/for_problems/hex.cpp \
+  ./src/for_problems/polyomino.cpp \
 
 OBJS =
 OBJS += $(C_SRC:%.c=%.o)
