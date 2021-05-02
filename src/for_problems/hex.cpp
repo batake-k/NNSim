@@ -9,22 +9,22 @@ Hex::Hex(ifstream &ifs){
   
 	{ // info board
     uint32_t size;
-    ofs.read((char*)&size, sizeof(uint32_t));
+    ifs.read((char*)&size, sizeof(uint32_t));
 
     board.resize(size);
-    ofs.read((char*)&board[0], sizeof(HexStruct)*size);
+    ifs.read((char*)&board[0], sizeof(HexStruct)*size);
   }
 
 	{ // info neurons
     uint32_t neurons_size;
-    ofs.read((char*)&neurons_size, sizeof(uint32_t));
+    ifs.read((char*)&neurons_size, sizeof(uint32_t));
     neurons.resize(neurons_size);
 
     for(uint32_t i=0; i<neurons_size; ++i){
       uint32_t size;
-      ofs.read((char*)&size, sizeof(uint32_t));
+      ifs.read((char*)&size, sizeof(uint32_t));
       neurons[i].resize(size);
-      ofs.read((char*)&neurons[i][0], sizeof(HexStruct)*size);
+      ifs.read((char*)&neurons[i][0], sizeof(HexStruct)*size);
     }
   }
 
@@ -39,7 +39,7 @@ bool Hex::isGoal(const std::vector<float>& outputs){
 
 	vector<HexStruct> tiles;
 
-	for(int i=0; i<outputs.size(); ++i){
+	for(uint32_t i=0; i<outputs.size(); ++i){
 		if(outputs[i] >= 0.5){
 
 			for(const auto &n : neurons[i]){

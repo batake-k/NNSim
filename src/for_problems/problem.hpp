@@ -6,8 +6,8 @@
 
 class Problem {
 public:
-  virtual bool isGoal(const std::vector<std::string>> &outputs) = 0;
-  virtual std::string getGoalStatus(const std::vector<std::string>> &outputs) = 0;
+  virtual bool isGoal(const std::vector<float> &outputs) = 0;
+  virtual std::string getGoalStatus(const std::vector<float> &outputs) = 0;
 };
 
 #endif

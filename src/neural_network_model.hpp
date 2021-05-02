@@ -1,6 +1,8 @@
 #ifndef NEURAL_NETWORK_MODEL_HPP
 #define NEURAL_NETWORK_MODEL_HPP
 
+#include "for_problems/hex.hpp"
+
 #include <vector>
 #include <string>
 #include <fstream>
@@ -10,11 +12,8 @@ class NeuralNetworkModel {
 public:
 
 	typedef struct {
-		std::string weights_file;
-		std::string biases_file;
-		std::string output_folder;
-
-		std::string hex_info_file;
+		std::string input_path;
+		std::string output_path;
 
 		bool synchronize;
 		uint32_t seed;
@@ -35,7 +34,7 @@ public:
 		float after_weight;
 	}Weight;
 
-	NeuralNetworkModel() {};
+	NeuralNetworkModel(){};
 	NeuralNetworkModel(const Parameters& parameters);
 	virtual ~NeuralNetworkModel() {};
 
@@ -66,12 +65,13 @@ private:
 	virtual float func(const float input) {return 0;};
 	virtual float inverseFunc(const float input) {return 0;};
 
-	void readWeights();
-	void readBiases();
+	void readWeights(std::ifstream& ifs);
+	void readBiases(std::ifstream& ifs);
 
 	void binarization();
 
-	std::ofstream ofs;
+  int problem_type;
+	Hex hex;
 };
 
 #endif

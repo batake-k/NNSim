@@ -86,7 +86,7 @@ void GaussianModel::simulate(){
 					float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
 					input_sum += outputs[w.neuron_id] * weight;
 				}
-				float bias = biases[i].before_bias + (biases[i].after_bias - biases[i].before_bias) * generation / parameters.generations;
+				float bias = biases[id].before_bias + (biases[id].after_bias - biases[id].before_bias) * generation / parameters.generations;
 				potentials[id] += parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + bias + dist(mt[0]));
 				outputs[id] = func(potentials[id]);
 			}

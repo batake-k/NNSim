@@ -5,15 +5,15 @@
 
 #include <fstream>
 
-typedef struct {
+struct HexStruct{
   int point;
   int x;
   int y;
 
-  operator==(const HexStruct &other) const{
+  bool operator==(const HexStruct &other) const{
     return (x == other.x && y == other.y);
   }
-} HexStruct;
+};
 
 class Hex : public Problem {
 public:

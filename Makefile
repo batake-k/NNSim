@@ -14,10 +14,10 @@ endif
 
 CPP_SRC=./src/main.cpp \
   ./src/gaussian_model.cpp \
-	./src/hex.cpp \
   ./src/neural_network_model.cpp \
 	./src/simulator.cpp \
   ./src/utils.cpp \
+  ./src/for_problems/hex.cpp \
 
 OBJS =
 OBJS += $(C_SRC:%.c=%.o)
@@ -32,7 +32,7 @@ objs/%.o: src/%.cpp
 	$(CXX) $(CXX_FLAGS) -c $< -o $@
 
 dir:
-	mkdir objs
+	mkdir objs objs/for_problems
 
 .PHONY: clean
 clean:

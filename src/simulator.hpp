@@ -11,11 +11,8 @@ class Simulator {
 public:
 
 	typedef struct {
-		std::string output_folder;
-		std::string weights_file;
-		std::string biases_file;
-
-		std::string hex_info_file;
+		std::string input_path;
+    std::string output_path;
 
 		char model;
 		bool synchronize;

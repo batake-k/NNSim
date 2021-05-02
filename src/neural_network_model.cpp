@@ -2,7 +2,6 @@
 
 #include "utils.hpp"
 #include "timer.hpp"
-#include "hex.hpp"
 
 #include <iostream>
 
@@ -14,22 +13,15 @@
 
 using namespace std;
 
-void NeuralNetworkModel::readBiases(){
-	ifstream ifs;
-	utils::fileOpen(ifs, parameters.biases_file, ios::binary);
-
+void NeuralNetworkModel::readBiases(ifstream &ifs){
 	uint32_t size;
 	ifs.read((char*)&size, sizeof(uint32_t));
 	biases.resize(size);
 
 	ifs.read((char*)&biases[0], sizeof(Bias)*size);
-	ifs.close();
 }
 
-void NeuralNetworkModel::readWeights(){
-	ifstream ifs;
-	utils::fileOpen(ifs, parameters.weights_file, ios::binary);
-
+void NeuralNetworkModel::readWeights(ifstream &ifs){
 	uint32_t neuron_size, size;
 	ifs.read((char*)&neuron_size, sizeof(uint32_t));
 	weights.resize(neuron_size);
@@ -39,30 +31,43 @@ void NeuralNetworkModel::readWeights(){
 		weights[i].resize(size);
 		ifs.read((char*)&weights[i][0], sizeof(Weight)*size);
 	}
-
-	ifs.close();
 }
 
 NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 
+  ifstream ifs;
+  utils::fileOpen(ifs, parameters.input_path, ios::binary);
+
+  ifs.read((char*)&problem_type, sizeof(int));
+
 	//read bias file, and init biases
 	Timer timer;
-	readBiases();
+	readBiases(ifs);
 	timer.elapsed("read biases file", 2);
 
 	//read weights file, and init weights
 	timer.restart();
-	readWeights();
+	readWeights(ifs);
 	timer.elapsed("read weights file", 2);
+
+  if(problem_type == 0){
+    
+  }else if(problem_type == 1){
+    
+  }else if(problem_type == 2){
+    hex = Hex(ifs);
+  }
+
+  ifs.close();
 
 #ifdef GUI
 	#if defined __linux__ || defined __APPLE__
-		if(mkdir(parameters.output_folder.c_str(), 0755) != 0){
+		if(mkdir(parameters.output_path.c_str(), 0755) != 0){
 			cerr << "[ERROR] failed to create directory" << endl;
 			exit(0);
 		}
 	#elif _WIN32
-		if(_makedir(parameters.output_folder) != 0){
+		if(_makedir(parameters.output_path) != 0){
 			cerr << "[ERROR] failed to create directory" << endl;
 			exit(0);
 		}
@@ -92,7 +97,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 #ifdef GUI
 
 	ofstream ofs;
-	utils::fileOpen(ofs, parameters.output_folder + "/" + to_string(generation), ios::out);
+	utils::fileOpen(ofs, parameters.output_path + "/" + to_string(generation), ios::out);
 	ofs << calcEnergy(generation) << endl << endl;
 
 	writeOutputs(ofs);
@@ -103,26 +108,19 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 #elif defined(EXP)
 
 	if(generation == parameters.generations){
-		Hex hex(parameters.hex_info_file);
-
 		ofstream ofs;
-		utils::fileOpen(ofs, parameters.output_folder, ios::out | ios::app);
+		utils::fileOpen(ofs, parameters.output_path, ios::out | ios::app);
+
 		binarization();
-		ofs << calcEnergy(generation) << ",";
-		if(hex.isGoal(outputs)){
-			ofs << "1";
-		}else{
-			ofs << "0";
-		}
+		ofs << calcEnergy(generation);
 
-		int _count = 0;
-		for(const auto e : outputs){
-			if(e >= 0.5){
-				++_count;
-			}
-		}
-
-		ofs << "," << _count << endl;
+    if(problem_type == 0){
+      ofs << endl;
+    }else if(problem_type == 1){
+      ofs << endl;
+    }else if(problem_type == 2){
+      ofs << hex.getGoalStatus(outputs) << endl;
+    }
 
 		ofs.close();
 	}
@@ -132,17 +130,6 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 }
 
 void NeuralNetworkModel::writeOutputs(ofstream& ofs){
-	/*int N = sqrt(num_neurons);
-
-	for(uint32_t i=0; i<num_neurons; ++i){
-		if((i+1) % N == 0){
-			ofs << outputs[i] << endl;
-		}else{
-			ofs << outputs[i] << ",";
-		}
-	}
-	ofs << endl;*/
-
 	for(uint32_t i=0; i<num_neurons; ++i){
 		if(i == num_neurons -1){
 			ofs << outputs[i];
