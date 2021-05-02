@@ -20,8 +20,8 @@ namespace{
 	vector<vector<int>> inverse(vector<vector<int>>& before){
 		vector<vector<int>> after(before.size(), vector<int>(before[0].size()));
 
-		for(int x=0; x<after.size(); ++x){
-			for(int y=0; y<after[0].size(); ++y){
+		for(int x=0; x<(int)after.size(); ++x){
+			for(int y=0; y<(int)after[0].size(); ++y){
 				after[x][y] = before[after.size()-x-1][y];
 			}
 		}
@@ -37,8 +37,8 @@ namespace{
 	vector<vector<int>> rotate90(vector<vector<int>>& before){
 		vector<vector<int>> after(before[0].size(), vector<int>(before.size()));
 
-		for(int x=0; x<after.size(); ++x){
-			for(int y=0; y<after[0].size(); ++y){
+		for(int x=0; x<(int)after.size(); ++x){
+			for(int y=0; y<(int)after[0].size(); ++y){
 				after[x][y] = before[before.size()-y-1][x];
 			}
 		}
@@ -67,8 +67,8 @@ Piece::Piece(vector<vector<int>>& default_state, int piece_number, bool rotation
 	size = piece_size;
 
 	int number_of_edges = 0;
-	for(int x=0; x<default_state.size(); ++x){
-		for(int y=0; y<default_state[0].size(); ++y){
+	for(int x=0; x<(int)default_state.size(); ++x){
+		for(int y=0; y<(int)default_state[0].size(); ++y){
 			if(default_state[x][y] != 1){
 				continue;
 			}
@@ -76,13 +76,13 @@ Piece::Piece(vector<vector<int>>& default_state, int piece_number, bool rotation
 			if(x-1 < 0 || default_state[x-1][y] == 0){
 				++number_of_edges;
 			}
-			if(x+1 >= default_state.size() || default_state[x+1][y] == 0){
+			if(x+1 >= (int)default_state.size() || default_state[x+1][y] == 0){
 				++number_of_edges;
 			}
 			if(y-1 < 0 || default_state[x][y-1] == 0){
 				++number_of_edges;
 			}
-			if(y+1 >= default_state[0].size() || default_state[x][y+1] == 0){
+			if(y+1 >= (int)default_state[0].size() || default_state[x][y+1] == 0){
 				++number_of_edges;
 			}
 		}

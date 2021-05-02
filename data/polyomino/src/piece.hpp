@@ -23,8 +23,8 @@ public:
 			return false;
 		}
 
-		for(int x=0; x<this->state.size(); ++x){
-			for(int y=0; y<this->state[0].size(); ++y){
+		for(int x=0; x<(int)(this->state.size()); ++x){
+			for(int y=0; y<(int)(this->state[0].size()); ++y){
 				if(this->state[x][y] != other_state[x][y]){
 					return false;
 				}

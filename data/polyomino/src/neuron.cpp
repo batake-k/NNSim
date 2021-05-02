@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void Neuron::Write(ofstream& ofs){
+void Neuron::write(ofstream& ofs){
 	ofs << piece_number << "," << size << "," << num_edges << endl;
 	for(const auto& vv : board){
 		for(const auto& v : vv){
@@ -16,6 +16,26 @@ void Neuron::Write(ofstream& ofs){
 		ofs << endl;
 	}
 	ofs << endl;
+}
+
+int countWallEdge(const Neuron& i){
+  int count = 0;
+  auto b = i.getBoard();
+
+  for(uint32_t x=0; x<b.size(); ++x){
+      for(uint32_t y=0; y<b[0].size(); ++y){
+        if(b[x][y] != 1){
+          continue;
+      }
+
+      if(x-1 < 0) ++count;
+      if(x+1 >= b.size()) ++count;
+      if(y-1 < 0) ++count;
+      if(y+1 >= b[0].size()) ++count;
+    }
+  }
+
+  return count;
 }
 
 /**
@@ -31,11 +51,11 @@ int countOverlapEdge(const Neuron& i, const Neuron& j){
 
 	int count=0;
 
-	vector<vector<int>> bi(i.board);
-	vector<vector<int>> bj(j.board);
+  auto bi = i.getBoard();
+  auto bj = j.getBoard();
 
-	for(int x=0; x<bi.size(); ++x){
-		for(int y=0; y<bi[0].size(); ++y){
+	for(uint32_t x=0; x<bi.size(); ++x){
+		for(uint32_t y=0; y<bi[0].size(); ++y){
 			bi[x][y] += 2 * bj[x][y];
 			if(bi[x][y] == 3){
 				return 0;
@@ -43,8 +63,8 @@ int countOverlapEdge(const Neuron& i, const Neuron& j){
 		}
 	}
 
-	for(int x=0; x<bi.size(); ++x){
-		for(int y=0; y<bi[0].size(); ++y){
+	for(int x=0; x<(int)bi.size(); ++x){
+		for(int y=0; y<(int)bi[0].size(); ++y){
 			if(bi[x][y] == 0 || bi[x][y] == 2){
 				continue;
 			}
@@ -52,13 +72,13 @@ int countOverlapEdge(const Neuron& i, const Neuron& j){
 			if(x-1 >= 0 && bi[x-1][y] == 2){
 				++count;
 			}
-			if(x+1 < bi.size() && bi[x+1][y] == 2){
+			if(x+1 < (int)bi.size() && bi[x+1][y] == 2){
 				++count;
 			}
 			if(y-1 >= 0 && bi[x][y-1] == 2){
 				++count;
 			}
-			if(y+1 < bi[0].size() && bi[x][y+1] == 2){
+			if(y+1 < (int)bi[0].size() && bi[x][y+1] == 2){
 				++count;
 			}
 		}

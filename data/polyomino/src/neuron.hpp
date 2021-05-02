@@ -13,18 +13,17 @@
 class Neuron {
 public:
 
-	std::vector<std::vector<int>> board; // ポリオミノが一つ置かれた盤面
-
 	Neuron() {};
 	~Neuron() {};
 
 	Neuron(std::vector<std::vector<int>>& _board, int _piece_number, int _size, int _num_edges):
 		board(_board),piece_number(_piece_number),size(_size),num_edges(_num_edges) {};
 
-	void Write(std::ofstream& ofs);
-	inline int getPieceNumber() const { return piece_number; };
-	inline int getSize() const { return size; };
-	inline int getNumEdges() const { return num_edges; };
+	void write(std::ofstream& ofs);
+	int getPieceNumber() const { return piece_number; };
+	int getSize() const { return size; };
+	int getNumEdges() const { return num_edges; };
+  std::vector<std::vector<int>> getBoard() const { return board; };
 
 	/**
 	 * 盤面を足し合わせる
@@ -41,12 +40,13 @@ public:
 	}
 
 private:
-
+	std::vector<std::vector<int>> board; // ポリオミノが一つ置かれた盤面
 	int piece_number; // ポリオミノのid
 	int size; // ポリオミノの大きさ
 	int num_edges; // ポリオミノの辺の数
 };
 
+int countWallEdge(const Neuron& i);
 int countOverlapEdge(const Neuron& i, const Neuron& j);
 int calcOverlap(const Neuron& i, const Neuron& j);
 
