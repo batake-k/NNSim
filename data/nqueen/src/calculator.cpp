@@ -22,7 +22,7 @@ vector<WeightDetail> Calculator::calcWeightDetail(const int x, const int y){
   for(int X=0; X<parameter.N; ++X){
     for(int Y=0; Y<parameter.N; ++Y){
 
-      if(x * y == X * Y) continue;
+      if(x*parameter.N + y == X*parameter.N + Y) continue;
 
       float b_A, b_B, b_C, b_D, b_E;
       float a_A, a_B, a_C, a_D, a_E;
