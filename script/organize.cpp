@@ -127,7 +127,7 @@ int main(int argc, char *argv[]){
 				sum += energies[i];
 			}
 
-			ofs_ave << sum/N;
+			ofs_ave << sum/trails;
 			ofs_goal << goal_count;
 
 			if(two_e != two_list[two_list.size()-1]){

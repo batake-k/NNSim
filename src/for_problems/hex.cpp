@@ -57,7 +57,7 @@ bool Hex::isGoal(const std::vector<float>& outputs){
 
 	for(const auto &b : board){
 
-    if(b.point != 0) continue;
+    if(b.point == 0) continue;
 
     if(find(tiles.begin(), tiles.end(), b) == tiles.end()) return false;
   }
