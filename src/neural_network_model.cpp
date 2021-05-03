@@ -52,7 +52,7 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 	timer.elapsed("read weights file", 2);
 
   if(problem_type == 0){
-    
+    nqueen = Nqueen(ifs);
   }else if(problem_type == 1){
     polyomino = Polyomino(ifs);
   }else if(problem_type == 2){
@@ -116,7 +116,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 		ofs << calcEnergy(generation);
 
     if(problem_type == 0){
-      ofs << endl;
+      ofs << nqueen.getGoalStatus(outputs) << endl;
     }else if(problem_type == 1){
       ofs << polyomino.getGoalStatus(outputs) << endl;
     }else if(problem_type == 2){

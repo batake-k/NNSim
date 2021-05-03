@@ -2,6 +2,7 @@
 #define NEURAL_NETWORK_MODEL_HPP
 
 #include "for_problems/hex.hpp"
+#include "for_problems/nqueen.hpp"
 #include "for_problems/polyomino.hpp"
 
 #include <vector>
@@ -73,6 +74,7 @@ private:
 
   int problem_type;
 	Hex hex;
+  Nqueen nqueen;
   Polyomino polyomino;
 };
 
