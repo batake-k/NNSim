@@ -5,13 +5,13 @@
 
 D=1
 
-./polyomino -i puzzle/puzzle2 \
-            -o puzzle2_A1B0.2C1D${D} \
+./polyomino -i puzzle/puzzle1 \
+            -o puzzle1_A1B0.2C1D${D} \
             -a 1 \
             -b 0.2 \
             -c 1 \
             -d ${D} \
-            -s 1 \
+            -s 4 \
             -x true \
-            -y true \
-            -z true
+            -y false \
+            -z false
