@@ -9,9 +9,8 @@ using namespace std;
 
 namespace{
 	void setNNMParameters(const Simulator::Parameters& p, NeuralNetworkModel::Parameters& NNMp){
-		NNMp.weights_file = p.weights_file;
-		NNMp.biases_file = p.biases_file;
-		NNMp.output_folder = p.output_folder;
+		NNMp.input_path = p.input_path;
+		NNMp.output_path = p.output_path;
 
 		NNMp.synchronize = p.synchronize;
 		NNMp.seed = p.seed;
@@ -56,13 +55,11 @@ void Simulator::run(po::variables_map &vm){
 void Simulator::setParameters(po::variables_map &vm){
 	// Required Options
 	cout << "[Required Options]" << endl;
-	parameters.output_folder = vm["output"].as<string>();
-	parameters.weights_file = vm["weights"].as<string>();
-	parameters.biases_file = vm["biases"].as<string>();
+  parameters.input_path = vm["input"].as<string>();
+	parameters.output_path = vm["output"].as<string>();
 
-	cout << "weights file:  " << parameters.weights_file << endl;
-	cout << "biases file:   " << parameters.biases_file << endl;
-	cout << "output folder: " << parameters.output_folder << endl << endl;
+	cout << "input path:    " << parameters.input_path << endl;
+	cout << "output path:   " << parameters.output_path << endl << endl;
 
 	// Network Options
 	cout << "[Network Options]" << endl;
@@ -101,7 +98,11 @@ void Simulator::setParameters(po::variables_map &vm){
 	parameters.T_mf = vm["T_mf"].as<float>();
 	cout << "T_mf:                    " << parameters.T_mf << endl;
 
-	parameters.time_constant_T_mf = vm["time_constant_T_mf"].as<uint32_t>();
+  if(!vm.count("time_constant_T_mf")){
+    parameters.time_constant_T_mf = parameters.generations;
+  }else{
+	  parameters.time_constant_T_mf = vm["time_constant_T_mf"].as<uint32_t>();
+  }
 	cout << "time constant T_mf:      " << parameters.time_constant_T_mf << endl << endl;
 
 	//Gaussian Annealing Parameters
@@ -113,6 +114,10 @@ void Simulator::setParameters(po::variables_map &vm){
 	}
 	cout << "T_epsilon:               " << parameters.T_epsilon << endl;
 
-	parameters.time_constant_T_epsilon = vm["time_constant_T_epsilon"].as<uint32_t>();
+  if(!vm.count("time_constant_T_epsilon")){
+    parameters.time_constant_T_epsilon = parameters.generations;
+  }else{
+	  parameters.time_constant_T_epsilon = vm["time_constant_T_epsilon"].as<uint32_t>();
+  }
 	cout << "time constant T_epsilon: " << parameters.time_constant_T_epsilon << endl << endl;
 }

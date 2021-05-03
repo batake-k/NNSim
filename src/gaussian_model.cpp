@@ -51,9 +51,11 @@ void GaussianModel::simulate(){
 			for(uint32_t i=0; i<num_neurons; ++i){
 				float input_sum = 0;
 				for(const auto& w : weights[i]){
-					input_sum += outputs_old[w.neuron_id] * w.weight;
+					float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
+					input_sum += outputs_old[w.neuron_id] * weight;
 				}
-				potentials[i] += parameters.delta_t * (- reciprocal_time_constant * potentials[i] + input_sum + biases[i] + dist(mt[id]));
+				float bias = biases[i].before_bias + (biases[i].after_bias - biases[i].before_bias) * generation / parameters.generations;
+				potentials[i] += parameters.delta_t * (- reciprocal_time_constant * potentials[i] + input_sum + bias + dist(mt[id]));
 				outputs[i] = func(potentials[i]);
 			}
 
@@ -81,9 +83,11 @@ void GaussianModel::simulate(){
 				uint32_t id = rand_int(mt[0]);
 				float input_sum = 0;
 				for(const auto& w : weights[id]){
-					input_sum += outputs[w.neuron_id] * w.weight;
+					float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
+					input_sum += outputs[w.neuron_id] * weight;
 				}
-				potentials[id] += parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + biases[id] + dist(mt[0]));
+				float bias = biases[id].before_bias + (biases[id].after_bias - biases[id].before_bias) * generation / parameters.generations;
+				potentials[id] += parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + bias + dist(mt[0]));
 				outputs[id] = func(potentials[id]);
 			}
 			timer.elapsed("update", 2);
@@ -137,7 +141,7 @@ float GaussianModel::func(const float input){
 }
 
 void GaussianModel::calcFreeEnergy(const uint32_t generation){
-	double E = calcEnergy();
+	double E = calcEnergy(generation);
 
 	double S = 0;
 	for(uint32_t i=0; i<num_neurons; ++i){

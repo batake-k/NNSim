@@ -13,22 +13,15 @@
 
 using namespace std;
 
-void NeuralNetworkModel::readBiases(){
-	ifstream ifs;
-	utils::fileOpen(ifs, parameters.biases_file, ios::binary);
-
+void NeuralNetworkModel::readBiases(ifstream &ifs){
 	uint32_t size;
 	ifs.read((char*)&size, sizeof(uint32_t));
 	biases.resize(size);
 
-	ifs.read((char*)&biases[0], sizeof(float)*size);
-	ifs.close();
+	ifs.read((char*)&biases[0], sizeof(Bias)*size);
 }
 
-void NeuralNetworkModel::readWeights(){
-	ifstream ifs;
-	utils::fileOpen(ifs, parameters.weights_file, ios::binary);
-
+void NeuralNetworkModel::readWeights(ifstream &ifs){
 	uint32_t neuron_size, size;
 	ifs.read((char*)&neuron_size, sizeof(uint32_t));
 	weights.resize(neuron_size);
@@ -38,30 +31,44 @@ void NeuralNetworkModel::readWeights(){
 		weights[i].resize(size);
 		ifs.read((char*)&weights[i][0], sizeof(Weight)*size);
 	}
-
-	ifs.close();
 }
 
 NeuralNetworkModel::NeuralNetworkModel(const Parameters& p):parameters(p){
 
+  ifstream ifs;
+  utils::fileOpen(ifs, parameters.input_path, ios::binary);
+
+  ifs.read((char*)&problem_type, sizeof(int));
+  cout << "problem type: " << problem_type << endl;
+
 	//read bias file, and init biases
 	Timer timer;
-	readBiases();
+	readBiases(ifs);
 	timer.elapsed("read biases file", 2);
 
 	//read weights file, and init weights
 	timer.restart();
-	readWeights();
+	readWeights(ifs);
 	timer.elapsed("read weights file", 2);
+
+  if(problem_type == 0){
+    nqueen = Nqueen(ifs);
+  }else if(problem_type == 1){
+    polyomino = Polyomino(ifs);
+  }else if(problem_type == 2){
+    hex = Hex(ifs);
+  }
+
+  ifs.close();
 
 #ifdef GUI
 	#if defined __linux__ || defined __APPLE__
-		if(mkdir(parameters.output_folder.c_str(), 0755) != 0){
+		if(mkdir(parameters.output_path.c_str(), 0755) != 0){
 			cerr << "[ERROR] failed to create directory" << endl;
 			exit(0);
 		}
 	#elif _WIN32
-		if(_makedir(parameters.output_folder) != 0){
+		if(_makedir(parameters.output_path) != 0){
 			cerr << "[ERROR] failed to create directory" << endl;
 			exit(0);
 		}
@@ -91,8 +98,8 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 #ifdef GUI
 
 	ofstream ofs;
-	utils::fileOpen(ofs, parameters.output_folder + "/" + to_string(generation), ios::out);
-	ofs << calcEnergy() << endl << endl;
+	utils::fileOpen(ofs, parameters.output_path + "/" + to_string(generation), ios::out);
+	ofs << calcEnergy(generation) << endl << endl;
 
 	writeOutputs(ofs);
 	writePotentials(ofs);
@@ -103,9 +110,19 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 
 	if(generation == parameters.generations){
 		ofstream ofs;
-		utils::fileOpen(ofs, parameters.output_folder, ios::out | ios::app);
+		utils::fileOpen(ofs, parameters.output_path, ios::out | ios::app);
+
 		binarization();
-		ofs << calcEnergy() << endl;
+		ofs << calcEnergy(generation);
+
+    if(problem_type == 0){
+      ofs << nqueen.getGoalStatus(outputs) << endl;
+    }else if(problem_type == 1){
+      ofs << polyomino.getGoalStatus(outputs) << endl;
+    }else if(problem_type == 2){
+      ofs << hex.getGoalStatus(outputs) << endl;
+    }
+
 		ofs.close();
 	}
 
@@ -114,11 +131,9 @@ void NeuralNetworkModel::writeData(const uint32_t generation){
 }
 
 void NeuralNetworkModel::writeOutputs(ofstream& ofs){
-	int N = sqrt(num_neurons);
-
 	for(uint32_t i=0; i<num_neurons; ++i){
-		if((i+1) % N == 0){
-			ofs << outputs[i] << endl;
+		if(i == num_neurons -1){
+			ofs << outputs[i];
 		}else{
 			ofs << outputs[i] << ",";
 		}
@@ -127,11 +142,9 @@ void NeuralNetworkModel::writeOutputs(ofstream& ofs){
 }
 
 void NeuralNetworkModel::writePotentials(ofstream& ofs){
-	int N = sqrt(num_neurons);
-
 	for(uint32_t i=0; i<num_neurons; ++i){
-		if((i+1) % N == 0){
-			ofs << potentials[i] << endl;
+		if(i == num_neurons -1){
+			ofs << potentials[i];
 		}else{
 			ofs << potentials[i] << ",";
 		}
@@ -149,15 +162,17 @@ void NeuralNetworkModel::binarization(){
 	}
 }
 
-double NeuralNetworkModel::calcEnergy(){
+double NeuralNetworkModel::calcEnergy(const uint32_t generation){
 	double E = 0;
 
 	for(uint32_t i=0; i<num_neurons; ++i){
 		for(const auto& w : weights[i]){
-			E -= 0.5 * outputs[i] * outputs[w.neuron_id] * w.weight;
+			float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
+			E -= 0.5 * outputs[i] * outputs[w.neuron_id] * weight;
 		}
 
-		E -= outputs[i] * biases[i];
+		float bias = biases[i].before_bias + (biases[i].after_bias - biases[i].before_bias) * generation / parameters.generations;
+		E -= outputs[i] * bias;
 	}
 
 	return E;
