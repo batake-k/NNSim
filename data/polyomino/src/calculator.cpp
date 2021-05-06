@@ -376,6 +376,9 @@ void Calculator::writeData(){
     ofs.write((char*)&size, sizeof(uint32_t));
 
     for(const auto &n : neurons){
+			int piece_number = n.getPieceNumber();
+			ofs.write((char*)&piece_number, sizeof(int));
+
       auto b = n.getBoard();
       uint32_t b_size = b.size();
       ofs.write((char*)&b_size, sizeof(uint32_t));

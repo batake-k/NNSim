@@ -16,6 +16,7 @@ public:
 
 private:
   std::vector<std::vector<std::vector<int>>> neurons;
+	std::vector<int> piece_numbers;
 };
 
 #endif

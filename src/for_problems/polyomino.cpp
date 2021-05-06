@@ -1,6 +1,7 @@
 #include "polyomino.hpp"
 
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -21,8 +22,13 @@ Polyomino::Polyomino(ifstream &ifs){
   uint32_t neurons_size;
   ifs.read((char*)&neurons_size, sizeof(uint32_t));
   neurons.resize(neurons_size);
+	piece_numbers.resize(neurons_size);
 
   for(uint32_t i=0; i<neurons_size; ++i){
+		int piece_number;
+		ifs.read((char*)&piece_number, sizeof(int));
+		piece_numbers[i] = piece_number;
+
     uint32_t size;
     ifs.read((char*)&size, sizeof(uint32_t));
     neurons[i].resize(size);
@@ -44,12 +50,19 @@ bool Polyomino::isGoal(const std::vector<float>& outputs){
     exit(1);
   }
 
+	vector<int> numbers;
 	vector<vector<int>> board(neurons[0].size(), vector<int>(neurons[0][0].size()));
 
 	for(uint32_t i=0; i<outputs.size(); ++i){
 		if(outputs[i] >= 0.5){
+			numbers.emplace_back(piece_numbers[i]);
       addBoard(board, neurons[i]);
 		}
+	}
+
+	sort(numbers.begin(), numbers.end());
+	if(unique(numbers.begin(), numbers.end()) != numbers.end()){
+		return false;
 	}
 
   for(const auto &b : board){
