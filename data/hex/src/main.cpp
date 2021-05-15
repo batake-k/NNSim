@@ -4,6 +4,7 @@
  * @date 2021/3/2
  */
 
+#include "generator.hpp"
 #include "calculator.hpp"
 
 #include <string>
@@ -17,8 +18,9 @@ namespace po = boost::program_options;
 
 namespace {
 
-  po::options_description DefineOption(){
+  po::options_description DefineCalcOption(){
     po::options_description opt;
+
     opt.add_options()
       ("input_file,i", po::value<std::string>(), "hex problem file")
       ("output_file,o", po::value<std::string>(), "output file")
@@ -31,6 +33,18 @@ namespace {
       ("output_data,x", po::value<bool>()->default_value(false), "flag to output data file")
       ("output_data_detail,y", po::value<bool>()->default_value(false), "flag to output data detail file")
       ("output_info,z", po::value<bool>()->default_value(false), "flag to output info file");
+
+    return opt;
+  }
+
+  po::options_description DefineGenOption(){
+    po::options_description opt;
+
+    opt.add_options()
+      ("board_size,b", po::value<int>(), "board size")
+      ("piece_sizes,p", po::value<std::string>(), "piece sizes")
+      ("output_path,o", po::value<std::string>(), "output path");
+
     return opt;
   }
 
@@ -50,62 +64,98 @@ namespace {
 
 int main(int argc, char *argv[]){
 
-  po::options_description opt = DefineOption();
-  po::variables_map vm = CommandParse(argc, argv, opt);
+  if(argc > 1 && strcmp(argv[1],"calculate") == 0){
 
-  if(!vm.count("input_file") || !vm.count("output_file") || !vm.count("cut_bubble_size")){
-    cout << "usage: hex [<options>]" << endl
-         << opt << endl;
-    exit(0);
-  }
+    po::options_description opt = DefineCalcOption();
+    po::variables_map vm = CommandParse(argc-1, argv+1, opt);
 
-  string input_file = vm["input_file"].as<string>();
-  string output_file = vm["output_file"].as<string>();
-  float A = vm["A"].as<float>();
-  float B = vm["B"].as<float>();
-  float C = vm["C"].as<float>();
-  float D = vm["D"].as<float>();
-  float E = vm["E"].as<float>();
-  int cut_bubble_size = vm["cut_bubble_size"].as<int>();
-  bool flag_info = vm["output_info"].as<bool>();
-  bool flag_data = vm["output_data"].as<bool>();
-  bool flag_data_detail = vm["output_data_detail"].as<bool>();
+    if(!vm.count("input_file") || !vm.count("output_file") || !vm.count("cut_bubble_size")){
+      cout << "usage: hex calculate [<options>]" << endl
+           << opt << endl;
+      exit(0);
+    }
 
-  if(!flag_info && !flag_data && !flag_data_detail){
-    cout << "please set some output option true." << endl;
-    exit(0);
-  }
+    string input_file = vm["input_file"].as<string>();
+    string output_file = vm["output_file"].as<string>();
+    float A = vm["A"].as<float>();
+    float B = vm["B"].as<float>();
+    float C = vm["C"].as<float>();
+    float D = vm["D"].as<float>();
+    float E = vm["E"].as<float>();
+    int cut_bubble_size = vm["cut_bubble_size"].as<int>();
+    bool flag_info = vm["output_info"].as<bool>();
+    bool flag_data = vm["output_data"].as<bool>();
+    bool flag_data_detail = vm["output_data_detail"].as<bool>();
 
-  cout << "input file:  " << input_file << endl
-       << "output file: " << output_file << endl
-       << "A:           " << A << endl
-       << "B:           " << B << endl
-       << "C:           " << C << endl
-       << "D:           " << D << endl
-       << "E:           " << E << endl
-       << "bubble size: " << cut_bubble_size << endl
-       << "info file:   " << flag_info << endl
-       << "data file:   " << flag_data << endl
-       << "detail file: " << flag_data_detail << endl;
+    if(!flag_info && !flag_data && !flag_data_detail){
+      cout << "please set some output option true." << endl;
+      exit(0);
+    }
 
-  Calculator::Parameter p =
-  {
-    input_file,
-    output_file,
-    A, B, C, D, E,
-    cut_bubble_size
-  };
+    cout << "input file:  " << input_file << endl
+         << "output file: " << output_file << endl
+         << "A:           " << A << endl
+         << "B:           " << B << endl
+         << "C:           " << C << endl
+         << "D:           " << D << endl
+         << "E:           " << E << endl
+         << "bubble size: " << cut_bubble_size << endl
+         << "info file:   " << flag_info << endl
+         << "data file:   " << flag_data << endl
+         << "detail file: " << flag_data_detail << endl;
 
-  Calculator calculator(p);
+    Calculator::Parameter p =
+    {
+      input_file,
+      output_file,
+      A, B, C, D, E,
+      cut_bubble_size
+    };
 
-  if(flag_info){
-    calculator.writeInfo();
-  }
-  if(flag_data){
-    calculator.writeData();
-  }
-  if(flag_data_detail){
-    calculator.writeDataDetail();
+    Calculator calculator(p);
+
+    if(flag_info){
+      calculator.writeInfo();
+    }
+    if(flag_data){
+      calculator.writeData();
+    }
+    if(flag_data_detail){
+      calculator.writeDataDetail();
+    }
+
+  }else if(argc > 1 && strcmp(argv[1],"generate") == 0){
+
+    po::options_description opt = DefineGenOption();
+    po::variables_map vm = CommandParse(argc-1, argv+1, opt);
+
+    if(!vm.count("board_size") || !vm.count("piece_sizes") || !vm.count("output_path")){
+      cout << "usage: hex generate [<options>]" << endl
+           << opt << endl;
+      exit(0);
+    }
+
+    int board_size = vm["board_size"].as<int>();
+    string piece_sizes = vm["piece_sizes"].as<string>();
+    string output_path = vm["output_path"].as<string>();
+
+    Generator::Parameter p =
+    {
+      board_size,
+      piece_sizes,
+      output_path
+    };
+
+    Generator generator(p);
+    generator.run();
+    generator.writeData();
+
+  }else{
+
+    cout << "There are two sub-commands:" << endl
+         << "calculate: calculate data for NNSim" << endl
+         << "generate:  generate puzzle" << endl;
+
   }
 
   return 0;
