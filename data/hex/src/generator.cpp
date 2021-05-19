@@ -67,29 +67,41 @@ namespace {
 
   }
 
-  void addHex(vector<Hex> &v){
-    std::random_device rd;
-    std::mt19937 eng(rd());
-    std::uniform_int_distribution<int> dist(0,v.size()-1);
-    std::uniform_int_distribution<int> dist2(1,6);
+	void addHex(vector<Hex> &v, vector<Hex> &v_sur, Hex &added){
+		v.emplace_back(added);
 
-    while(true){
-      Hex base_hex(v[dist(eng)]);
-      int add_position = dist2(eng);
+		vector<pair<int,int>> sur = {{2,0},{1,-1},{-1,-1},{-2,0},{-1,1},{1,1}};
 
-      Hex added_hex(0, 2, 0);
-      for(int i=1; i<add_position; ++i){
-        added_hex.rotate60();
-      }
-      added_hex += base_hex;
+		for(const auto &s : sur){
+			Hex sur_hex(0, s.first, s.second);
+			sur_hex += added;
 
-      auto iter = find(v.begin(), v.end(), added_hex);
-      if(iter == v.end() && !hasBubble(v, added_hex)){
-        v.emplace_back(added_hex);
-        return;
-      }
+			if(find(v_sur.begin(), v_sur.end(), sur_hex) == v_sur.end() &&
+				 find(v.begin(), v.end(), sur_hex) == v.end()){
+				v_sur.emplace_back(sur_hex);
+			}
+		}
 
-    }
+	}
+
+  void addHex(vector<Hex> &v, vector<Hex> &v_sur){
+
+		while(true){
+    	std::random_device rd;
+    	std::mt19937 eng(rd());
+    	std::uniform_int_distribution<int> dist(0,v_sur.size()-1);
+
+			Hex added_hex = v_sur[dist(eng)];
+
+			if(!hasBubble(v, added_hex)){
+				addHex(v, v_sur, added_hex);
+
+				auto iter = find(v_sur.begin(), v_sur.end(), added_hex);
+				v_sur.erase(iter);
+				return;
+			}
+		}
+
   }
 
   void alignWithStandards(vector<Hex> &hexs){
@@ -115,15 +127,15 @@ namespace {
 
   bool isSame(vector<Hex> one, vector<Hex> two){
 
+		alignWithStandards(one);
+
     for(int i=0; i<6; ++i){
 
       for(auto &e_two : two){
         e_two.rotate60();
       }
 
-      alignWithStandards(one);
       alignWithStandards(two);
-
       bool is_same_flag = true;
 
       for(const auto &e_two : two){
@@ -136,6 +148,31 @@ namespace {
         return true;
       }
     }
+
+		for(auto &e_two : two){
+			e_two.inverse();
+		}
+
+    for(int i=0; i<6; ++i){
+
+      for(auto &e_two : two){
+        e_two.rotate60();
+      }
+
+      alignWithStandards(two);
+      bool is_same_flag = true;
+
+      for(const auto &e_two : two){
+        if(find(one.begin(), one.end(), e_two) == one.end()){
+          is_same_flag = false;
+        }
+      }
+
+      if(is_same_flag){
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -146,9 +183,12 @@ void Generator::run(){
 
   // generate board
   cout << "board size: " << parameter.board_size << endl;
-  board.emplace_back(base);
+  //board.emplace_back(base);
+	vector<Hex> board_sur;
+	addHex(board, board_sur, base);
+
   for(int i=1; i<parameter.board_size; ++i){
-    addHex(board);
+    addHex(board, board_sur);
   }
 
   // generate pieces
@@ -157,11 +197,12 @@ void Generator::run(){
 
   for(int i=0; i<s_piece_sizes.size(); ++i){
     vector<Hex> piece;
-    piece.emplace_back(base);
+		vector<Hex> piece_sur;
+    addHex(piece, piece_sur, base);
 
     int piece_size = stoi(s_piece_sizes[i]);
     for(int j=1; j<piece_size; ++j){
-      addHex(piece);
+      addHex(piece, piece_sur);
     }
 
     bool is_already_exists = false;
