@@ -60,6 +60,8 @@ public:
 private:
   Parameter parameter;
 
+	float overlap_edge_max;
+
   std::vector<Hex> board;
   std::vector<Piece> pieces;
   std::vector<Neuron> neurons;

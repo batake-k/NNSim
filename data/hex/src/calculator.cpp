@@ -174,6 +174,20 @@ Calculator::Calculator(Parameter &_parameter):parameter(_parameter){
   cout << "board size:  " << board.size() << endl
        << "num pieces:  " << pieces.size() << endl
        << "num neurons: " << neurons.size() << endl;
+
+	overlap_edge_max = 0;
+
+	for(uint32_t i=0; i<neurons.size(); ++i){
+		for(uint32_t j=0; j<neurons.size(); ++j){
+			float overlap_edge = (float)calcConnectEdge(neurons[i], neurons[j]);
+
+			if(overlap_edge > overlap_edge_max){
+				overlap_edge_max = overlap_edge;
+			}
+		}
+	}
+
+	cout << "overlap edge max: " << overlap_edge_max << endl;
 }
 
 void Calculator::writeInfo(){
@@ -200,6 +214,11 @@ void Calculator::writeInfo(){
 vector<BiasDetail> Calculator::calcBiasDetail(){
   vector<BiasDetail> biases;
 
+	vector<Hex> surrounding_hexs;
+	for(const auto &h : board){
+		addSurroundingHex(h.getX(), h.getY(), surrounding_hexs, board);
+	}
+
   for(const auto &n : neurons){
     float b_A, b_B, b_C, b_D, b_E;
     float a_A, a_B, a_C, a_D, a_E;
@@ -212,11 +231,16 @@ vector<BiasDetail> Calculator::calcBiasDetail(){
       pn += h.getPoint();
     }
 
+		b_A = - parameter.A / n.getSize();
+		a_A = - parameter.A / n.getSize();
+
     b_B = 0.5 * parameter.B * pn;
     a_B = 0.5 * parameter.B * pn;
 
-    b_E = - parameter.E;
-    a_E = - parameter.E;
+		int wall_edge = calcConnectWall(hexs, surrounding_hexs);
+
+		b_E = parameter.E * wall_edge;
+		a_E = parameter.E * wall_edge;
 
     BiasDetail bd = {b_A, b_B, b_C, b_D, b_E, a_A, a_B, a_C, a_D, a_E};
     biases.emplace_back(bd);
@@ -247,10 +271,9 @@ vector<WeightDetail> Calculator::calcWeightDetail(const uint32_t neuron_id){
       a_C = - parameter.C;
     }
 
-    /*
-    b_D = parameter.D * calcConnectEdge(neurons[neuron_id], neurond[i]);
-    a_D = parameter.D * calcConnectEdge(neurons[neuron_id], neurond[i]);
-    */
+    float overlap_edge = (float)calcConnectEdge(neurons[neuron_id], neurons[i]);
+    b_D = parameter.D * (overlap_edge - overlap_edge_max);
+    //a_D = parameter.D * (overlap_edge - overlap_edge_max);
 
     if((b_A + b_B + b_C + b_D + b_E) != 0 || (a_A + a_B + a_C + a_D + a_E) != 0){
       WeightDetail wd = {i, b_A, b_B, b_C, b_D, b_E, a_A, a_B, a_C, a_D, a_E};
