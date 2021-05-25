@@ -225,6 +225,27 @@ Calculator::Calculator(Parameter &_parameter):parameter(_parameter){
 		}
 	}
   cout << "generate " << neurons.size() << " neurons" << endl;
+
+	overlap_edge_max = 0;
+	overlap_edge_ave = 0;
+
+	for(uint32_t i=0; i<neurons.size(); ++i){
+		for(uint32_t j=0; j<neurons.size(); ++j){
+			if(i == j) continue;
+
+			float overlap_edge = (float)countOverlapEdge(neurons[i], neurons[j]);
+
+			overlap_edge_ave += overlap_edge;
+			if(overlap_edge > overlap_edge_max){
+				overlap_edge_max = overlap_edge;
+			}
+		}
+	}
+	overlap_edge_ave /= (neurons.size() * (neurons.size()-1));
+
+	cout << "overlap edge max: " << overlap_edge_max << endl;
+	cout << "overlap edge ave: " << overlap_edge_ave << endl;
+
 }
 
 void Calculator::writeInfo(){
@@ -290,8 +311,12 @@ vector<WeightDetail> Calculator::calcWeightDetail(const uint32_t neuron_id){
 
 	  float overlap_edge = (float)countOverlapEdge(neurons[neuron_id], neurons[i]);
 
-		b_D = parameter.D * overlap_edge;
+		//b_D = parameter.D * overlap_edge;
+		b_D = parameter.D * (overlap_edge - overlap_edge_max);
+
+
     //a_D = parameter.D * overlap_edge;
+		//a_D = parameter.D * (overlap_edge - overlap_edge_max);
 
     if((b_A + b_B + b_C + b_D + b_E) != 0 || (a_A + a_B + a_C + a_D + a_E) != 0){
 	    WeightDetail wd = {i, b_A, b_B, b_C, b_D, b_E, a_A, a_B, a_C, a_D, a_E};
