@@ -11,7 +11,6 @@ public:
 	Polyomino(){};
 	~Polyomino(){};
 
-	bool isGoal(const std::vector<float> &outputs);
 	int getScore(const std::vector<float> &outputs);
   std::string getGoalStatus(const std::vector<float> &outputs);
 

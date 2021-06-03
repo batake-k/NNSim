@@ -31,7 +31,9 @@ Hex::Hex(ifstream &ifs){
 	ifs.close();
 }
 
-bool Hex::isGoal(const std::vector<float>& outputs){
+int Hex::getScore(const std::vector<float>& outputs){
+	int score = 0;
+
   if(outputs.size() != neurons.size()){
     cerr << "[ERROR] neurons size differ from outputs size" << endl;
     exit(1);
@@ -44,10 +46,12 @@ bool Hex::isGoal(const std::vector<float>& outputs){
 
 			for(const auto &n : neurons[i]){
 
-        // 重なりがあるか判断
+        // 重なりがある
 				if(find(tiles.begin(), tiles.end(), n) != tiles.end()){
-          // 重なってはならない場所か判断
-          if(n.point != 0) return false;
+          // 重なってはならない場所
+          if(n.point != 0){
+						--score;
+					}
         }else{
           tiles.emplace_back(n);
         }
@@ -59,10 +63,12 @@ bool Hex::isGoal(const std::vector<float>& outputs){
 
     if(b.point == 0) continue;
 
-    if(find(tiles.begin(), tiles.end(), b) == tiles.end()) return false;
+    if(find(tiles.begin(), tiles.end(), b) == tiles.end()){
+			--score;
+		}
   }
 
-  return true;
+  return score;
 }
 
 string Hex::getGoalStatus(const vector<float> &outputs){
@@ -71,9 +77,11 @@ string Hex::getGoalStatus(const vector<float> &outputs){
     if(o >= 0.5) ++count;
   }
 
-  if(isGoal(outputs)){
-    return ",1," + to_string(count);
+	int score = getScore(outputs);
+
+  if(score == 0){
+    return ",1," + to_string(count) + "," + to_string(score);
   }else{
-    return ",0," + to_string(count);
+    return ",0," + to_string(count) + "," + to_string(score);
   }
 }
