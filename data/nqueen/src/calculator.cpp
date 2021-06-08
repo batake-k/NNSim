@@ -24,9 +24,9 @@ vector<WeightDetail> Calculator::calcWeightDetail(const int x, const int y){
 
       if(x*parameter.N + y == X*parameter.N + Y) continue;
 
-      float b_A, b_B, b_C, b_D, b_E;
-      float a_A, a_B, a_C, a_D, a_E;
-      b_A = b_B = b_C = b_D = b_E = a_A = a_B = a_C = a_D = a_E = 0;
+      float b_A, b_B, b_C, b_D, b_E, b_F;
+      float a_A, a_B, a_C, a_D, a_E, a_F;
+      b_A = b_B = b_C = b_D = b_E = b_F = a_A = a_B = a_C = a_D = a_E = a_F = 0;
 
       b_A = - parameter.A * KDelta(x, X) * (1 - KDelta(y, Y));
       a_A = - parameter.A * KDelta(x, X) * (1 - KDelta(y, Y));
@@ -40,7 +40,8 @@ vector<WeightDetail> Calculator::calcWeightDetail(const int x, const int y){
       b_D = - parameter.D * KDelta(x - y, X - Y) * (1 - KDelta(x, X));
       a_D = - parameter.D * KDelta(x - y, X - Y) * (1 - KDelta(x, X));
 
-      if((b_A + b_B + b_C + b_D + b_E) != 0 && (a_A + a_B + a_C + a_D + a_E) != 0){
+			if(!(b_A == 0 && b_B == 0 && b_C == 0 && b_D == 0 && b_E == 0 && b_F == 0) ||
+				 !(a_A == 0 && a_B == 0 && a_C == 0 && a_D == 0 && a_E == 0 && a_F == 0)){
         uint32_t id = X * parameter.N + Y;
         WeightDetail wd = {id, b_A, b_B, b_C, b_D, b_E, a_A, a_B, a_C, a_D, a_E};
         weights.emplace_back(wd);
@@ -128,11 +129,13 @@ void Calculator::writeData(){
         vector<Weight> weights;
 
         for(const auto &wd : weight_details){
-          float b = wd.b_A + wd.b_B + wd.b_C + wd.b_D + wd.b_E;
-          float a = wd.a_A + wd.a_B + wd.a_C + wd.a_D + wd.a_E;
+          float b = wd.b_A + wd.b_B + wd.b_C + wd.b_D + wd.b_E + wd.b_F;
+          float a = wd.a_A + wd.a_B + wd.a_C + wd.a_D + wd.a_E + wd.a_F;
 
-          Weight weight = {wd.neuron_id, b, a};
-          weights.emplace_back(weight);
+					if(b != 0 || a != 0){
+          	Weight weight = {wd.neuron_id, b, a};
+          	weights.emplace_back(weight);
+					}
         }
 
         uint32_t size = weights.size();
