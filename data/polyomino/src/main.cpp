@@ -27,6 +27,7 @@ namespace {
       ("C,c", po::value<float>()->default_value(0), "Constraint C: for bubble")
       ("D,d", po::value<float>()->default_value(0), "Constraint D: for piece connections")
       ("E,e", po::value<float>()->default_value(0), "Constraint E: for wall connections")
+      ("F,f", po::value<float>()->default_value(0), "Constraint F: for minus weights")
       ("gamma,g", po::value<float>()->default_value(1), "gamma")
       ("cut_bubble_size,s", po::value<int>(), "maximum bubble size")
       ("rotation,R", po::value<bool>()->default_value(true), "flag to consider rotation")
@@ -69,6 +70,7 @@ int main(int argc, char *argv[]){
   float C = vm["C"].as<float>();
   float D = vm["D"].as<float>();
   float E = vm["E"].as<float>();
+  float F = vm["F"].as<float>();
   float gamma = vm["gamma"].as<float>();
   int cut_bubble_size = vm["cut_bubble_size"].as<int>();
   bool rotation = vm["rotation"].as<bool>();
@@ -89,6 +91,7 @@ int main(int argc, char *argv[]){
        << "C:           " << C << endl
        << "D:           " << D << endl
        << "E:           " << E << endl
+       << "F:           " << F << endl
        << "gamma:       " << gamma << endl
        << "bubble size: " << cut_bubble_size << endl
        << "rotation:    " << rotation << endl
@@ -101,7 +104,7 @@ int main(int argc, char *argv[]){
   {
     input_file,
     output_file,
-    A, B, C, D, E,
+    A, B, C, D, E, F,
     gamma,
     cut_bubble_size,
     rotation,
