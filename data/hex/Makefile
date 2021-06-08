@@ -4,6 +4,7 @@ CXX_FLAGS=-Wall -std=c++11 -O3 -fopenmp
 #C_SRC= \
 
 CPP_SRC=./src/calculator.cpp \
+  ./src/generator.cpp \
   ./src/main.cpp \
 	./src/neuron.cpp \
   ./src/piece.cpp \
