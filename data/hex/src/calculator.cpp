@@ -215,8 +215,8 @@ vector<BiasDetail> Calculator::calcBiasDetail(){
     b_B = 0.5 * parameter.B * pn;
     a_B = 0.5 * parameter.B * pn;
 
-    b_E = - parameter.E;
-    a_E = - parameter.E;
+    b_E = - parameter.E / n.getSize();
+    a_E = - parameter.E / n.getSize();
 
     BiasDetail bd = {b_A, b_B, b_C, b_D, b_E, a_A, a_B, a_C, a_D, a_E};
     biases.emplace_back(bd);
