@@ -7,12 +7,12 @@
 #ifndef CALCULATOR_HPP
 #define CALCULATOR_HPP
 
-#include "hex.hpp"
-#include "piece.hpp"
-#include "neuron.hpp"
-
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "hex.hpp"
+#include "neuron.hpp"
+#include "piece.hpp"
 
 typedef struct {
   float before_bias;
@@ -38,11 +38,10 @@ typedef struct {
 
 class Calculator {
 public:
-
   typedef struct {
     std::string input_file;
     std::string output_file;
-    float A,B,C,D,E,F;
+    float A, B, C, D, E, F;
     int cut_bubble_size;
   } Parameter;
 

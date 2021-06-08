@@ -5,83 +5,87 @@
 
 using namespace std;
 
-Hex::Hex(ifstream &ifs){
-  
-	{ // info board
+Hex::Hex(ifstream &ifs) {
+
+  {  // info board
     uint32_t size;
-    ifs.read((char*)&size, sizeof(uint32_t));
+    ifs.read((char *)&size, sizeof(uint32_t));
 
     board.resize(size);
-    ifs.read((char*)&board[0], sizeof(HexStruct)*size);
+    ifs.read((char *)&board[0], sizeof(HexStruct) * size);
   }
 
-	{ // info neurons
+  {  // info neurons
     uint32_t neurons_size;
-    ifs.read((char*)&neurons_size, sizeof(uint32_t));
+    ifs.read((char *)&neurons_size, sizeof(uint32_t));
     neurons.resize(neurons_size);
 
-    for(uint32_t i=0; i<neurons_size; ++i){
+    for (uint32_t i = 0; i < neurons_size; ++i) {
       uint32_t size;
-      ifs.read((char*)&size, sizeof(uint32_t));
+      ifs.read((char *)&size, sizeof(uint32_t));
       neurons[i].resize(size);
-      ifs.read((char*)&neurons[i][0], sizeof(HexStruct)*size);
+      ifs.read((char *)&neurons[i][0], sizeof(HexStruct) * size);
     }
   }
 
-	ifs.close();
+  ifs.close();
 }
 
-int Hex::getScore(const std::vector<float>& outputs){
-	int score = 0;
+int Hex::getScore(const std::vector<float> &outputs) {
+  int score = 0;
 
-  if(outputs.size() != neurons.size()){
+  if (outputs.size() != neurons.size()) {
     cerr << "[ERROR] neurons size differ from outputs size" << endl;
     exit(1);
   }
 
-	vector<HexStruct> tiles;
+  vector<HexStruct> tiles;
 
-	for(uint32_t i=0; i<outputs.size(); ++i){
-		if(outputs[i] >= 0.5){
+  for (uint32_t i = 0; i < outputs.size(); ++i) {
 
-			for(const auto &n : neurons[i]){
+    if (outputs[i] >= 0.5) {
+
+      for (const auto &n : neurons[i]) {
 
         // 重なりがある
-				if(find(tiles.begin(), tiles.end(), n) != tiles.end()){
+        if (find(tiles.begin(), tiles.end(), n) != tiles.end()) {
+
           // 重なってはならない場所
-          if(n.point != 0){
-						--score;
-					}
-        }else{
+          if (n.point != 0) {
+            --score;
+          }
+
+        } else {
           tiles.emplace_back(n);
         }
-			}
-		}
-	}
+      }
+    }
+  }
 
-	for(const auto &b : board){
+  for (const auto &b : board) {
 
-    if(b.point == 0) continue;
+    if (b.point == 0) continue;
 
-    if(find(tiles.begin(), tiles.end(), b) == tiles.end()){
-			--score;
-		}
+    if (find(tiles.begin(), tiles.end(), b) == tiles.end()) {
+      --score;
+    }
   }
 
   return score;
 }
 
-string Hex::getGoalStatus(const vector<float> &outputs){
+string Hex::getGoalStatus(const vector<float> &outputs) {
   int count = 0;
-  for(const auto o : outputs){
-    if(o >= 0.5) ++count;
+
+  for (const auto o : outputs) {
+    if (o >= 0.5) ++count;
   }
 
-	int score = getScore(outputs);
+  int score = getScore(outputs);
 
-  if(score == 0){
+  if (score == 0) {
     return ",1," + to_string(count) + "," + to_string(score);
-  }else{
+  } else {
     return ",0," + to_string(count) + "," + to_string(score);
   }
 }

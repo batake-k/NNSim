@@ -7,8 +7,8 @@
 #ifndef CALCULATOR_HPP
 #define CALCULATOR_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
 typedef struct {
   float before_bias;
@@ -34,14 +34,13 @@ typedef struct {
 
 class Calculator {
 public:
-
   typedef struct {
     std::string output_file;
     int N;
-    float A,B,C,D,E,F;
+    float A, B, C, D, E, F;
   } Parameter;
 
-  Calculator(Parameter &_parameter):parameter(_parameter){};
+  Calculator(Parameter &_parameter) : parameter(_parameter){};
   Calculator(){};
   ~Calculator(){};
 
@@ -53,7 +52,6 @@ public:
 
 private:
   Parameter parameter;
-
 };
 
 #endif

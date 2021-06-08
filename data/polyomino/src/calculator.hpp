@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * @author Kazuki Takabatake
  * @date 2021/5/2
  */
@@ -7,11 +7,11 @@
 #ifndef CALCULATOR_HPP
 #define CALCULATOR_HPP
 
+#include <string>
+#include <vector>
+
 #include "neuron.hpp"
 #include "piece.hpp"
-
-#include <vector>
-#include <string>
 
 struct Bias {
   float before_bias;
@@ -37,11 +37,10 @@ struct WeightDetail {
 
 class Calculator {
 public:
-
-  struct Parameter{
+  struct Parameter {
     std::string input_file;
     std::string output_file;
-    float A,B,C,D,E,F;
+    float A, B, C, D, E, F;
     float gamma;
     int cut_bubble_size;
     bool rotation;
@@ -49,8 +48,8 @@ public:
   };
 
   Calculator(Parameter &_parameter);
-  Calculator() {};
-  ~Calculator() {};
+  Calculator(){};
+  ~Calculator(){};
 
   std::vector<BiasDetail> calcBiasDetail();
   std::vector<WeightDetail> calcWeightDetail(const uint32_t neuron_id);
