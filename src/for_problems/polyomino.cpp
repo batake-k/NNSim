@@ -44,11 +44,8 @@ Polyomino::Polyomino(ifstream &ifs){
 	ifs.close();
 }
 
-bool Polyomino::isGoal(const std::vector<float>& outputs){
-  if(outputs.size() != neurons.size()){
-    cerr << "[ERROR] neurons size differ from outputs size" << endl;
-    exit(1);
-  }
+int Polyomino::getScore(const std::vector<float>& outputs){
+  int score = 0;
 
 	vector<int> numbers;
 	vector<vector<int>> board(neurons[0].size(), vector<int>(neurons[0][0].size()));
@@ -60,24 +57,28 @@ bool Polyomino::isGoal(const std::vector<float>& outputs){
 		}
 	}
 
+  int before_size = numbers.size();
 	sort(numbers.begin(), numbers.end());
-	if(unique(numbers.begin(), numbers.end()) != numbers.end()){
-		return false;
-	}
+	numbers.erase(unique(numbers.begin(), numbers.end()), numbers.end());
+  int after_size = numbers.size();
+  score = after_size - before_size;
 
   for(const auto &b : board){
     for(const auto &bb : b){
-      if(bb != 1) return false;
+      if(bb != 1) --score;
     }
   }
 
-  return true;
+  return score;
+  
 }
 
 string Polyomino::getGoalStatus(const vector<float> &outputs){
-  if(isGoal(outputs)){
-    return ",1";
+  int score = getScore(outputs);
+
+  if(score == 0){
+    return ",1," + to_string(score);
   }else{
-    return ",0";
+    return ",0," + to_string(score);
   }
 }

@@ -225,6 +225,7 @@ Calculator::Calculator(Parameter &_parameter):parameter(_parameter){
 		}
 	}
   cout << "generate " << neurons.size() << " neurons" << endl;
+
 }
 
 void Calculator::writeInfo(){
@@ -270,9 +271,9 @@ vector<WeightDetail> Calculator::calcWeightDetail(const uint32_t neuron_id){
 	for(uint32_t i=0; i<neurons.size(); ++i){
     if(neuron_id == i) continue;
 
-    float b_A, b_B, b_C, b_D, b_E;
-    float a_A, a_B, a_C, a_D, a_E;
-    b_A = b_B = b_C = b_D = b_E = a_A = a_B = a_C = a_D = a_E = 0;
+    float b_A, b_B, b_C, b_D, b_E, b_F;
+    float a_A, a_B, a_C, a_D, a_E, a_F;
+    b_A = b_B = b_C = b_D = b_E = a_A = a_B = a_C = a_D = a_E = b_F = a_F = 0;
 
 	  if(neurons[neuron_id].getPieceNumber() == neurons[i].getPieceNumber()){
 		  b_A = - parameter.A;
@@ -293,8 +294,11 @@ vector<WeightDetail> Calculator::calcWeightDetail(const uint32_t neuron_id){
 		b_D = parameter.D * overlap_edge;
     //a_D = parameter.D * overlap_edge;
 
-    if((b_A + b_B + b_C + b_D + b_E) != 0 || (a_A + a_B + a_C + a_D + a_E) != 0){
-	    WeightDetail wd = {i, b_A, b_B, b_C, b_D, b_E, a_A, a_B, a_C, a_D, a_E};
+		b_F = - parameter.F;
+
+		if(!(b_A == 0 && b_B == 0 && b_C == 0 && b_D == 0 && b_E == 0 && b_F == 0) ||
+			 !(a_A == 0 && a_B == 0 && a_C == 0 && a_D == 0 && a_E == 0 && a_F == 0)){
+	    WeightDetail wd = {i, b_A, b_B, b_C, b_D, b_E, b_F, a_A, a_B, a_C, a_D, a_E, a_F};
       weights.emplace_back(wd);
     }
   }
@@ -358,11 +362,13 @@ void Calculator::writeData(){
       vector<Weight> weights;
 
       for(const auto &wd : weight_details){
-        float b = wd.b_A + wd.b_B + wd.b_C + wd.b_D + wd.b_E;
-        float a = wd.a_A + wd.a_B + wd.a_C + wd.a_D + wd.a_E;
+        float b = wd.b_A + wd.b_B + wd.b_C + wd.b_D + wd.b_E + wd.b_F;
+        float a = wd.a_A + wd.a_B + wd.a_C + wd.a_D + wd.a_E + wd.a_F;
 
-        Weight weight = {wd.neuron_id, b, a};
-        weights.emplace_back(weight);
+				if(b != 0 || a != 0){
+					Weight weight = {wd.neuron_id, b, a};
+					weights.emplace_back(weight);
+				}
       }
 
       uint32_t size = weights.size();

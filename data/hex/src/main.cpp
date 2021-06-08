@@ -24,11 +24,12 @@ namespace {
     opt.add_options()
       ("input_file,i", po::value<std::string>(), "hex problem file")
       ("output_file,o", po::value<std::string>(), "output file")
-      ("A,a", po::value<float>()->default_value(0), "Constraint A: None")
+      ("A,a", po::value<float>()->default_value(0), "Constraint A: for penalty")
       ("B,b", po::value<float>()->default_value(0), "Constraint B: for overlap")
       ("C,c", po::value<float>()->default_value(0), "Constraint C: for bubble")
-      ("D,d", po::value<float>()->default_value(0), "Constraint D: None")
-      ("E,e", po::value<float>()->default_value(0), "Constraint E: for penalty")
+      ("D,d", po::value<float>()->default_value(0), "Constraint D: for piece connections")
+      ("E,e", po::value<float>()->default_value(0), "Constraint E: for wall connections")
+      ("F,f", po::value<float>()->default_value(0), "Constraint F: for minus weights")
       ("cut_bubble_size,s", po::value<int>(), "maximum bubble size")
       ("output_data,x", po::value<bool>()->default_value(false), "flag to output data file")
       ("output_data_detail,y", po::value<bool>()->default_value(false), "flag to output data detail file")
@@ -82,6 +83,7 @@ int main(int argc, char *argv[]){
     float C = vm["C"].as<float>();
     float D = vm["D"].as<float>();
     float E = vm["E"].as<float>();
+    float F = vm["F"].as<float>();
     int cut_bubble_size = vm["cut_bubble_size"].as<int>();
     bool flag_info = vm["output_info"].as<bool>();
     bool flag_data = vm["output_data"].as<bool>();
@@ -99,6 +101,7 @@ int main(int argc, char *argv[]){
          << "C:           " << C << endl
          << "D:           " << D << endl
          << "E:           " << E << endl
+         << "F:           " << F << endl
          << "bubble size: " << cut_bubble_size << endl
          << "info file:   " << flag_info << endl
          << "data file:   " << flag_data << endl
@@ -108,7 +111,7 @@ int main(int argc, char *argv[]){
     {
       input_file,
       output_file,
-      A, B, C, D, E,
+      A, B, C, D, E, F,
       cut_bubble_size
     };
 
@@ -155,7 +158,6 @@ int main(int argc, char *argv[]){
     cout << "There are two sub-commands:" << endl
          << "calculate: calculate data for NNSim" << endl
          << "generate:  generate puzzle" << endl;
-
   }
 
   return 0;

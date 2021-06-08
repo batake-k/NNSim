@@ -31,8 +31,8 @@ struct Weight {
 
 struct WeightDetail {
   uint32_t neuron_id;
-  float b_A, b_B, b_C, b_D, b_E;
-  float a_A, a_B, a_C, a_D, a_E;
+  float b_A, b_B, b_C, b_D, b_E, b_F;
+  float a_A, a_B, a_C, a_D, a_E, a_F;
 };
 
 class Calculator {
@@ -41,7 +41,7 @@ public:
   struct Parameter{
     std::string input_file;
     std::string output_file;
-    float A,B,C,D,E;
+    float A,B,C,D,E,F;
     float gamma;
     int cut_bubble_size;
     bool rotation;

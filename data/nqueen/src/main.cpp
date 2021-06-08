@@ -27,6 +27,7 @@ namespace {
       ("C,c", po::value<float>()->default_value(0), "Constraint C: diagonal 1")
       ("D,d", po::value<float>()->default_value(0), "Constraint D: diagonal 2")
       ("E,e", po::value<float>()->default_value(0), "Constraint E: None")
+      ("F,f", po::value<float>()->default_value(0), "Constraint F: None")
       ("output_data,x", po::value<bool>()->default_value(false), "flag to output data file")
       ("output_data_detail,y", po::value<bool>()->default_value(false), "flag to output data detail file");
     return opt;
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]){
   float C = vm["C"].as<float>();
   float D = vm["D"].as<float>();
   float E = vm["E"].as<float>();
+  float F = vm["F"].as<float>();
   bool flag_data = vm["output_data"].as<bool>();
   bool flag_data_detail = vm["output_data_detail"].as<bool>();
 
@@ -79,6 +81,7 @@ int main(int argc, char *argv[]){
        << "C:           " << C << endl
        << "D:           " << D << endl
        << "E:           " << E << endl
+       << "F:           " << F << endl
        << "data file:   " << flag_data << endl
        << "detail file: " << flag_data_detail << endl;
 
@@ -86,7 +89,7 @@ int main(int argc, char *argv[]){
   {
     output_file,
     N,
-    A, B, C, D, E,
+    A, B, C, D, E, F,
   };
 
   Calculator calculator(p);
