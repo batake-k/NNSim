@@ -166,6 +166,7 @@ void Calculator::writeInfo() {
   ofstream ofs(parameter.output_file + "_info");
   ofs << polycubes.size() << "," << neurons.size() << "," << space_cubes.size() << endl << endl;
 
+  /*
   vector<Cube> surrounding_cubes;
   for (const auto &c : space_cubes) {
     addSurroundingCube(c, surrounding_cubes, space_cubes);
@@ -174,6 +175,24 @@ void Calculator::writeInfo() {
   ofs << surrounding_cubes.size() << endl;
   for (const auto &c : surrounding_cubes) {
     ofs << c.getStatus() << endl;
+  }
+  ofs << endl;
+  */
+
+  vector<string> bones;
+
+  for (uint32_t i = 0; i < space_cubes.size() - 1; ++i) {
+    for (uint32_t j = i + 1; j < space_cubes.size(); ++j) {
+      if (space_cubes[i].isConnect(space_cubes[j])) {
+        string s = space_cubes[i].getStatus() + "," + space_cubes[j].getStatus();
+        bones.emplace_back(s);
+      }
+    }
+  }
+
+  ofs << bones.size() << endl;
+  for (const auto& bone : bones) {
+    ofs << bone << endl;
   }
   ofs << endl;
 
