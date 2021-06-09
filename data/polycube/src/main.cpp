@@ -1,7 +1,7 @@
 /**
  * main関数を記述
  * @author Kazuki Takabatake
- * @date 2021/3/2
+ * @date 2021/6/9
  */
 
 #include <boost/program_options.hpp>
@@ -21,12 +21,12 @@ po::options_description DefineCalcOption() {
   po::options_description opt;
 
   opt.add_options()
-    ("input_file,i", po::value<std::string>(), "hex problem file")
+    ("input_file,i", po::value<std::string>(), "polycube problem file")
     ("output_file,o", po::value<std::string>(), "output file")
     ("A,a", po::value<float>()->default_value(0), "Constraint A: for penalty")
     ("B,b", po::value<float>()->default_value(0), "Constraint B: for overlap")
     ("C,c", po::value<float>()->default_value(0), "Constraint C: for bubble")
-    ("D,d", po::value<float>()->default_value(0), "Constraint D: for piece connections")
+    ("D,d", po::value<float>()->default_value(0), "Constraint D: for polycube connections")
     ("E,e", po::value<float>()->default_value(0), "Constraint E: for wall connections")
     ("F,f", po::value<float>()->default_value(0), "Constraint F: for minus weights")
     ("cut_bubble_size,s", po::value<int>(), "maximum bubble size")
@@ -41,8 +41,8 @@ po::options_description DefineGenOption() {
   po::options_description opt;
 
   opt.add_options()
-    ("board_size,b", po::value<int>(), "board size")
-    ("piece_sizes,p", po::value<std::string>(), "piece sizes")
+    ("space_size,b", po::value<int>(), "space size")
+    ("polycube_sizes,p", po::value<std::string>(), "polycube sizes")
     ("output_path,o", po::value<std::string>(), "output path");
 
   return opt;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     po::variables_map vm = CommandParse(argc - 1, argv + 1, opt);
 
     if (!vm.count("input_file") || !vm.count("output_file") || !vm.count("cut_bubble_size")) {
-      cout << "usage: hex calculate [<options>]" << endl << opt << endl;
+      cout << "usage: polycube calculate [<options>]" << endl << opt << endl;
       exit(0);
     }
 
@@ -121,16 +121,16 @@ int main(int argc, char *argv[]) {
     po::options_description opt = DefineGenOption();
     po::variables_map vm = CommandParse(argc - 1, argv + 1, opt);
 
-    if (!vm.count("board_size") || !vm.count("piece_sizes") || !vm.count("output_path")) {
-      cout << "usage: hex generate [<options>]" << endl << opt << endl;
+    if (!vm.count("space_size") || !vm.count("polycube_sizes") || !vm.count("output_path")) {
+      cout << "usage: polycube generate [<options>]" << endl << opt << endl;
       exit(0);
     }
 
-    int board_size = vm["board_size"].as<int>();
-    string piece_sizes = vm["piece_sizes"].as<string>();
+    int space_size = vm["space_size"].as<int>();
+    string polycube_sizes = vm["polycube_sizes"].as<string>();
     string output_path = vm["output_path"].as<string>();
 
-    Generator::Parameter p = {board_size, piece_sizes, output_path};
+    Generator::Parameter p = {space_size, polycube_sizes, output_path};
 
     Generator generator(p);
     generator.run();
