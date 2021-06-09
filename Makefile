@@ -23,6 +23,7 @@ CPP_SRC=./src/main.cpp \
   ./src/utils.cpp \
   ./src/for_problems/hex.cpp \
   ./src/for_problems/nqueen.cpp \
+  ./src/for_problems/polycube.cpp \
   ./src/for_problems/polyomino.cpp \
 
 OBJS =

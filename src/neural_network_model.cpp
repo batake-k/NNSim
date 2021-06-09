@@ -55,6 +55,8 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
     polyomino = Polyomino(ifs);
   } else if (problem_type == 2) {
     hex = Hex(ifs);
+  } else if (problem_type == 3) {
+    polycube = PolyCube(ifs);
   }
 
   ifs.close();
@@ -119,6 +121,8 @@ void NeuralNetworkModel::writeData(const uint32_t generation) {
       ofs << polyomino.getGoalStatus(outputs) << endl;
     } else if (problem_type == 2) {
       ofs << hex.getGoalStatus(outputs) << endl;
+    } else if (problem_type == 3) {
+      ofs << polycube.getGoalStatus(outputs) << endl;
     }
 
     ofs.close();
