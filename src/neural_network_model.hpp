@@ -8,6 +8,7 @@
 
 #include "for_problems/hex.hpp"
 #include "for_problems/nqueen.hpp"
+#include "for_problems/polycube.hpp"
 #include "for_problems/polyomino.hpp"
 
 class NeuralNetworkModel {
@@ -75,6 +76,7 @@ private:
   int problem_type;
   Hex hex;
   Nqueen nqueen;
+  PolyCube polycube;
   Polyomino polyomino;
 };
 
