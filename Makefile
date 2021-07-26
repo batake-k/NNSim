@@ -25,6 +25,7 @@ CPP_SRC=./src/main.cpp \
   ./src/for_problems/nqueen.cpp \
   ./src/for_problems/polycube.cpp \
   ./src/for_problems/polyomino.cpp \
+  ./src/for_problems/polyomino2.cpp \
 
 OBJS =
 OBJS += $(C_SRC:%.c=%.o)

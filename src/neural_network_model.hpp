@@ -10,6 +10,7 @@
 #include "for_problems/nqueen.hpp"
 #include "for_problems/polycube.hpp"
 #include "for_problems/polyomino.hpp"
+#include "for_problems/polyomino2.hpp"
 
 class NeuralNetworkModel {
 public:
@@ -78,6 +79,7 @@ private:
   Nqueen nqueen;
   PolyCube polycube;
   Polyomino polyomino;
+  Polyomino2 polyomino2;
 };
 
 #endif
