@@ -98,6 +98,9 @@ bool checkBubble(const vector<pair<int,int>> &board, const vector<pair<int,int>>
       if (bubble_s.size() > (uint32_t)cut_bubble_size) break;
     }
 
+    if (bubble_s.size() <= (uint32_t)cut_bubble_size) {
+      return true;
+    }
   }
   return false;
 }
@@ -273,7 +276,7 @@ void Calculator::writeDataDetail() {
 
 void Calculator::writeData() {
   ofstream ofs(parameter.output_file + "_data", ios::binary);
-  uint32_t neurons_size = neurons.size();
+/*  uint32_t neurons_size = neurons.size();
 
   {  // problem type
     int type = 4;
@@ -317,7 +320,7 @@ void Calculator::writeData() {
       ofs.write((char *)&weights[0], sizeof(Weight) * size);
     }
   }
-
+*/
   {  // info board
     uint32_t size = board.size();
     ofs.write((char *)&size, sizeof(uint32_t));
