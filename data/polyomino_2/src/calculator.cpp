@@ -80,6 +80,26 @@ void addSurroundingSquare(const int x, const int y, vector<pair<int,int>> &surro
   }
 }
 
+void addBoardSurroundingSquare(const int x, const int y, vector<pair<int,int>> &surrounding_s,
+                          const vector<pair<int,int>> &squares,
+                          const vector<pair<int,int>> &board = vector<pair<int,int>>()) {
+  vector<pair<int,int>> possible_s = {{x+1, y}, {x-1, y}, {x, y+1}, {x, y-1}, {x+1, y+1}, {x+1,y-1}, {x-1, y+1}, {x-1, y-1}};
+
+  for (auto &s : possible_s) {
+    if (find(surrounding_s.begin(), surrounding_s.end(), s) != surrounding_s.end() ||
+        find(squares.begin(), squares.end(), s) != squares.end()) {
+      continue;
+    }
+
+    if (!board.empty()) {
+      auto iter = find(board.begin(), board.end(), s);
+      if (iter == board.end()) continue;
+    }
+
+    surrounding_s.emplace_back(s);
+  }
+}
+
 bool checkBubble(const vector<pair<int,int>> &board, const vector<pair<int,int>> &squares, const int cut_bubble_size) {
   vector<pair<int,int>> surrounding_s;
 
@@ -164,7 +184,7 @@ void Calculator::writeInfo() {
 
   vector<pair<int,int>> surrounding_s;
   for (const auto &s : board) {
-    addSurroundingSquare(s.first, s.second, surrounding_s, board);
+    addBoardSurroundingSquare(s.first, s.second, surrounding_s, board);
   }
 
   ofs << surrounding_s.size() << endl;
@@ -276,7 +296,7 @@ void Calculator::writeDataDetail() {
 
 void Calculator::writeData() {
   ofstream ofs(parameter.output_file + "_data", ios::binary);
-/*  uint32_t neurons_size = neurons.size();
+  /*uint32_t neurons_size = neurons.size();
 
   {  // problem type
     int type = 4;
