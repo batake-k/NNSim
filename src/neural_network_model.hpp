@@ -6,11 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "for_problems/hex.hpp"
-#include "for_problems/nqueen.hpp"
-#include "for_problems/polycube.hpp"
 #include "for_problems/polyomino.hpp"
-#include "for_problems/polyomino2.hpp"
 
 class NeuralNetworkModel {
 public:
@@ -75,11 +71,7 @@ private:
   void binarization();
 
   int problem_type;
-  Hex hex;
-  Nqueen nqueen;
-  PolyCube polycube;
   Polyomino polyomino;
-  Polyomino2 polyomino2;
 };
 
 #endif

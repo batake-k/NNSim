@@ -49,17 +49,7 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
   readWeights(ifs);
   timer.elapsed("read weights file", 2);
 
-  if (problem_type == 0) {
-    nqueen = Nqueen(ifs);
-  } else if (problem_type == 1) {
-    polyomino = Polyomino(ifs);
-  } else if (problem_type == 2) {
-    hex = Hex(ifs);
-  } else if (problem_type == 3) {
-    polycube = PolyCube(ifs);
-  } else if (problem_type == 4) {
-    polyomino2 = Polyomino2(ifs);
-  }
+  polyomino = Polyomino(ifs);
 
   ifs.close();
 
@@ -116,18 +106,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation) {
 
     binarization();
     ofs << calcEnergy(generation);
-
-    if (problem_type == 0) {
-      ofs << nqueen.getGoalStatus(outputs) << endl;
-    } else if (problem_type == 1) {
-      ofs << polyomino.getGoalStatus(outputs) << endl;
-    } else if (problem_type == 2) {
-      ofs << hex.getGoalStatus(outputs) << endl;
-    } else if (problem_type == 3) {
-      ofs << polycube.getGoalStatus(outputs) << endl;
-    } else if (problem_type == 4) {
-      ofs << polyomino2.getGoalStatus(outputs) << endl;
-    }
+    ofs << polyomino.getGoalStatus(outputs) << endl;
 
     ofs.close();
   }

@@ -208,15 +208,15 @@ vector<BiasDetail> Calculator::calcBiasDetail() {
   }
 
   for (const auto &n : neurons) {
-    float b_A, b_B, b_C, b_D, b_E;
-    float a_A, a_B, a_C, a_D, a_E;
-    b_A = b_B = b_C = b_D = b_E = a_A = a_B = a_C = a_D = a_E = 0;
+    float b_A, b_B, b_E, b_G;
+    float a_A, a_B, a_E, a_G;
+    b_A = b_B = b_E = b_G = a_A = a_B = a_E = a_G = 0;
 
     auto squares = n.getSquares();
     int pn = squares.size();
 
-    b_A = -parameter.A / n.getSize();
-    a_A = -parameter.A / n.getSize();
+    b_A = 0.5 * parameter.A;
+    a_A = 0.5 * parameter.A;
 
     b_B = 0.5 * parameter.B * pn;
     a_B = 0.5 * parameter.B * pn;
@@ -226,7 +226,10 @@ vector<BiasDetail> Calculator::calcBiasDetail() {
     b_E = parameter.E * wall_edge;
     a_E = parameter.E * wall_edge;
 
-    BiasDetail bd = {b_A, b_B, b_C, b_D, b_E, a_A, a_B, a_C, a_D, a_E};
+    b_G = - parameter.G / n.getSize();
+    a_G = - parameter.G / n.getSize();
+
+    BiasDetail bd = {b_A, b_B, b_E, b_G, a_A, a_B, a_E, a_G};
     biases.emplace_back(bd);
   }
   return biases;
@@ -238,9 +241,14 @@ vector<WeightDetail> Calculator::calcWeightDetail(const uint32_t neuron_id) {
   for (uint32_t i = 0; i < neurons.size(); ++i) {
     if (neuron_id == i) continue;
 
-    float b_A, b_B, b_C, b_D, b_E, b_F;
-    float a_A, a_B, a_C, a_D, a_E, a_F;
-    b_A = b_B = b_C = b_D = b_E = a_A = a_B = a_C = a_D = a_E = b_F = a_F = 0;
+    float b_A, b_B, b_C, b_D, b_F;
+    float a_A, a_B, a_C, a_D, a_F;
+    b_A = b_B = b_C = b_D = b_F = a_A = a_B = a_C = a_D = a_F = 0;
+
+    if(neurons[neuron_id].getPieceId() == neurons[i].getPieceId()){
+      b_A = - parameter.A;
+      a_A = - parameter.A;
+    }
 
     int overlap_point = calcOverlapPoint(neurons[neuron_id], neurons[i]);
     b_B = -parameter.B * overlap_point;
@@ -257,13 +265,12 @@ vector<WeightDetail> Calculator::calcWeightDetail(const uint32_t neuron_id) {
 
     float overlap_edge = (float)calcConnectEdge(neurons[neuron_id], neurons[i]);
     b_D = parameter.D * overlap_edge;
-    // a_D = parameter.D * overlap_edge;
 
     b_F = -parameter.F;
 
-    if (!(b_A == 0 && b_B == 0 && b_C == 0 && b_D == 0 && b_E == 0 && b_F == 0) ||
-        !(a_A == 0 && a_B == 0 && a_C == 0 && a_D == 0 && a_E == 0 && a_F == 0)) {
-      WeightDetail wd = {i, b_A, b_B, b_C, b_D, b_E, b_F, a_A, a_B, a_C, a_D, a_E, a_F};
+    if (!(b_A == 0 && b_B == 0 && b_C == 0 && b_D == 0 && b_F == 0) ||
+        !(a_A == 0 && a_B == 0 && a_C == 0 && a_D == 0 && a_F == 0)) {
+      WeightDetail wd = {i, b_A, b_B, b_C, b_D, b_F, a_A, a_B, a_C, a_D, a_F};
       weights.emplace_back(wd);
     }
   }
@@ -296,7 +303,7 @@ void Calculator::writeDataDetail() {
 
 void Calculator::writeData() {
   ofstream ofs(parameter.output_file + "_data", ios::binary);
-  /*uint32_t neurons_size = neurons.size();
+  uint32_t neurons_size = neurons.size();
 
   {  // problem type
     int type = 4;
@@ -308,9 +315,9 @@ void Calculator::writeData() {
     vector<Bias> biases;
 
     for (const auto &bd : bias_details) {
-      float b = bd.b_A + bd.b_B + bd.b_C + bd.b_D + bd.b_E;
-      float a = bd.a_A + bd.a_B + bd.a_C + bd.a_D + bd.a_E;
-      Bias bias = {b, a};
+      float b = bd.b_A + bd.b_B + bd.b_E + bd.b_G;
+      float a = bd.a_A + bd.a_B + bd.a_E + bd.b_G;
+     Bias bias = {b, a};
       biases.emplace_back(bias);
     }
 
@@ -326,8 +333,8 @@ void Calculator::writeData() {
       vector<Weight> weights;
 
       for (const auto &wd : weight_details) {
-        float b = wd.b_A + wd.b_B + wd.b_C + wd.b_D + wd.b_E + wd.b_F;
-        float a = wd.a_A + wd.a_B + wd.a_C + wd.a_D + wd.a_E + wd.a_F;
+        float b = wd.b_A + wd.b_B + wd.b_C + wd.b_D + wd.b_F;
+        float a = wd.a_A + wd.a_B + wd.a_C + wd.a_D + wd.a_F;
 
         if (b != 0 || a != 0) {
           Weight weight = {wd.neuron_id, b, a};
@@ -340,7 +347,7 @@ void Calculator::writeData() {
       ofs.write((char *)&weights[0], sizeof(Weight) * size);
     }
   }
-*/
+
   {  // info board
     uint32_t size = board.size();
     ofs.write((char *)&size, sizeof(uint32_t));

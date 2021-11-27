@@ -15,8 +15,8 @@ public:
   std::string getGoalStatus(const std::vector<float> &outputs);
 
 private:
-  std::vector<std::vector<std::vector<int>>> neurons;
-  std::vector<int> piece_numbers;
+  std::vector<std::pair<int,int>> board;
+  std::vector<std::vector<std::pair<int,int>>> neurons;
 };
 
 #endif

@@ -23,12 +23,14 @@ po::options_description DefineCalcOption() {
   opt.add_options()
     ("input_file,i", po::value<std::string>(), "problem file")
     ("output_file,o", po::value<std::string>(), "output file")
-    ("A,a", po::value<float>()->default_value(0), "Constraint A: for penalty")
+    ("problem_type,p", po::value<int>(), "problem type (1, 2, 3)")
+    ("A,a", po::value<float>()->default_value(0), "Constraint A: for number of use")
     ("B,b", po::value<float>()->default_value(0), "Constraint B: for overlap")
     ("C,c", po::value<float>()->default_value(0), "Constraint C: for bubble")
     ("D,d", po::value<float>()->default_value(0), "Constraint D: for piece connections")
     ("E,e", po::value<float>()->default_value(0), "Constraint E: for wall connections")
     ("F,f", po::value<float>()->default_value(0), "Constraint F: for minus weights")
+    ("G,g", po::value<float>()->default_value(0), "Constraint G: for size")
     ("cut_bubble_size,s", po::value<int>(), "maximum bubble size")
     ("output_data,x", po::value<bool>()->default_value(false), "flag to output data file")
     ("output_data_detail,y", po::value<bool>()->default_value(false), "flag to output data detail file")
@@ -67,19 +69,21 @@ int main(int argc, char *argv[]) {
     po::options_description opt = DefineCalcOption();
     po::variables_map vm = CommandParse(argc - 1, argv + 1, opt);
 
-    if (!vm.count("input_file") || !vm.count("output_file") || !vm.count("cut_bubble_size")) {
+    if (!vm.count("input_file") || !vm.count("output_file") || !vm.count("problem_type") || !vm.count("cut_bubble_size")) {
       cout << "usage: polyomino calculate [<options>]" << endl << opt << endl;
       exit(0);
     }
 
     string input_file = vm["input_file"].as<string>();
     string output_file = vm["output_file"].as<string>();
+    int problem_type = vm["problem_type"].as<int>();
     float A = vm["A"].as<float>();
     float B = vm["B"].as<float>();
     float C = vm["C"].as<float>();
     float D = vm["D"].as<float>();
     float E = vm["E"].as<float>();
     float F = vm["F"].as<float>();
+    float G = vm["G"].as<float>();
     int cut_bubble_size = vm["cut_bubble_size"].as<int>();
     bool flag_info = vm["output_info"].as<bool>();
     bool flag_data = vm["output_data"].as<bool>();
@@ -87,6 +91,18 @@ int main(int argc, char *argv[]) {
 
     if (!flag_info && !flag_data && !flag_data_detail) {
       cout << "please set some output option true." << endl;
+      exit(0);
+    }
+
+    if(problem_type == 1){
+      G = 0;
+    }else if(problem_type == 2){
+      A = 0;
+      G = 0;
+    }else if(problem_type == 3){
+      A = 0;
+    }else{
+      cout << "plese set problem_type appropriately." << endl;
       exit(0);
     }
 
@@ -98,12 +114,13 @@ int main(int argc, char *argv[]) {
          << "D:           " << D << endl
          << "E:           " << E << endl
          << "F:           " << F << endl
+         << "G:           " << G << endl
          << "bubble size: " << cut_bubble_size << endl
          << "info file:   " << flag_info << endl
          << "data file:   " << flag_data << endl
          << "detail file: " << flag_data_detail << endl;
 
-    Calculator::Parameter p = {input_file, output_file, A, B, C, D, E, F, cut_bubble_size};
+    Calculator::Parameter p = {input_file, output_file, A, B, C, D, E, F, G, cut_bubble_size};
 
     Calculator calculator(p);
 

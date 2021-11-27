@@ -21,11 +21,7 @@ CPP_SRC=./src/main.cpp \
   ./src/neural_network_model.cpp \
 	./src/simulator.cpp \
   ./src/utils.cpp \
-  ./src/for_problems/hex.cpp \
-  ./src/for_problems/nqueen.cpp \
-  ./src/for_problems/polycube.cpp \
   ./src/for_problems/polyomino.cpp \
-  ./src/for_problems/polyomino2.cpp \
 
 OBJS =
 OBJS += $(C_SRC:%.c=%.o)
