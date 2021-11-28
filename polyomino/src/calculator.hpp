@@ -40,6 +40,7 @@ public:
   typedef struct {
     std::string input_file;
     std::string output_file;
+		int problem_type;
     float A, B, C, D, E, F, G;
     int cut_bubble_size;
   } Parameter;

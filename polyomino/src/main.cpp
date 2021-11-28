@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
          << "data file:   " << flag_data << endl
          << "detail file: " << flag_data_detail << endl;
 
-    Calculator::Parameter p = {input_file, output_file, A, B, C, D, E, F, G, cut_bubble_size};
+    Calculator::Parameter p = {input_file, output_file, problem_type, A, B, C, D, E, F, G, cut_bubble_size};
 
     Calculator calculator(p);
 

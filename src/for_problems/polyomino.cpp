@@ -19,8 +19,11 @@ Polyomino::Polyomino(ifstream &ifs) {
     uint32_t neurons_size;
     ifs.read((char *)&neurons_size, sizeof(uint32_t));
     neurons.resize(neurons_size);
+		piece_ids.resize(neurons_size);
 
     for (uint32_t i = 0; i < neurons_size; ++i) {
+			ifs.read((char *)&piece_ids[i], sizeof(int));
+
       uint32_t size;
       ifs.read((char *)&size, sizeof(uint32_t));
       neurons[i].resize(size);
@@ -29,6 +32,23 @@ Polyomino::Polyomino(ifstream &ifs) {
   }
 
   ifs.close();
+}
+
+int Polyomino::getPieceScore(const std::vector<float> &outputs) {
+	vector<int> used_piece_ids;
+
+  for (uint32_t i = 0; i < outputs.size(); ++i) {
+    if (outputs[i] >= 0.5) {
+			used_piece_ids.emplace_back(piece_ids[i]);
+    }
+  }
+
+	int before_size = used_piece_ids.size();
+	sort(used_piece_ids.begin(), used_piece_ids.end());
+	used_piece_ids.erase(unique(used_piece_ids.begin(), used_piece_ids.end()), used_piece_ids.end());
+	int after_size = used_piece_ids.size();
+
+  return after_size - before_size;
 }
 
 int Polyomino::getScore(const std::vector<float> &outputs) {
@@ -69,16 +89,12 @@ int Polyomino::getScore(const std::vector<float> &outputs) {
 
 string Polyomino::getGoalStatus(const vector<float> &outputs) {
   int count = 0;
-
   for (const auto o : outputs) {
     if (o >= 0.5) ++count;
   }
 
   int score = getScore(outputs);
+	int piece_score = getPieceScore(outputs);
 
-  if (score == 0) {
-    return ",1," + to_string(count) + "," + to_string(score);
-  } else {
-    return ",0," + to_string(count) + "," + to_string(score);
-  }
+	return "," + to_string(count) + "," + to_string(score) + "," + to_string(piece_score);
 }

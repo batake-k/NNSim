@@ -131,6 +131,7 @@ int calcConnectWall(const vector<pair<int,int>> &squares, const vector<pair<int,
   for (const auto &s : squares) {
     for (const auto &w : walls) {
       if ((s.first - w.first)*(w.first - s.first) + (s.second - w.second)*(w.second - s.second) >= -1) ++num;
+      //if ((w.first - s.first == 1 && w.second == s.second) || (w.second - s.second == 1 && w.first == s.first)) ++num;
     }
   }
   return num;
@@ -263,7 +264,7 @@ vector<WeightDetail> Calculator::calcWeightDetail(const uint32_t neuron_id) {
       a_C = -parameter.C;
     }
 
-    float overlap_edge = (float)calcConnectEdge(neurons[neuron_id], neurons[i]);
+    float overlap_edge = (float)calcConnectEdge(neurons[neuron_id], neurons[i], parameter.problem_type);
     b_D = parameter.D * overlap_edge;
 
     b_F = -parameter.F;
@@ -304,7 +305,7 @@ void Calculator::writeDataDetail() {
 void Calculator::writeData() {
   ofstream ofs(parameter.output_file + "_data", ios::binary);
   uint32_t neurons_size = neurons.size();
-
+/*
   {  // problem type
     int type = 4;
     ofs.write((char *)&type, sizeof(int));
@@ -347,7 +348,7 @@ void Calculator::writeData() {
       ofs.write((char *)&weights[0], sizeof(Weight) * size);
     }
   }
-
+*/
   {  // info board
     uint32_t size = board.size();
     ofs.write((char *)&size, sizeof(uint32_t));
@@ -359,6 +360,9 @@ void Calculator::writeData() {
     ofs.write((char *)&size, sizeof(uint32_t));
 
     for (const auto &n : neurons) {
+			int piece_id = n.getPieceId();
+			ofs.write((char *)&piece_id, sizeof(int));
+
       auto squares = n.getSquares();
       uint32_t squares_size = squares.size();
       ofs.write((char *)&squares_size, sizeof(uint32_t));

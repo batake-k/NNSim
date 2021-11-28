@@ -43,12 +43,14 @@ int calcOverlapPoint(const Neuron& neuron_i, const Neuron& neuron_j) {
   return point;
 }
 
-int calcConnectEdge(const Neuron& neuron_i, const Neuron& neuron_j) {
+int calcConnectEdge(const Neuron& neuron_i, const Neuron& neuron_j, const int problem_type) {
   int edge = 0;
 
   if (calcOverlap(neuron_i, neuron_j) > 0) {
     return 0;
-  }
+  }else if(problem_type == 1 && neuron_i.getPieceId() == neuron_j.getPieceId()){
+		return 0;
+	}
 
   auto i_squares = neuron_i.getSquares();
   auto j_squares = neuron_j.getSquares();

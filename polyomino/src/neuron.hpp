@@ -29,7 +29,7 @@ private:
 };
 
 int calcOverlap(const Neuron& neuron_i, const Neuron& neuron_j);
-int calcConnectEdge(const Neuron& neuron_i, const Neuron& neuron_j);
+int calcConnectEdge(const Neuron& neuron_i, const Neuron& neuron_j, const int problem_type);
 int calcOverlapPoint(const Neuron& neuron_i, const Neuron& neuron_j);
 
 #endif
