@@ -15,7 +15,7 @@ for i in range(num_threads):
 		num += 1
 		sp = line.split(',')
 
-		if sp[2] == "0.0" and sp[3] == "0.0":
+		if float(sp[2]) == 0.0 and float(sp[3]) == 0.0:
 			num_solved += 1
 
 		sum_score += float(sp[2])
