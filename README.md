@@ -1,1 +1,1 @@
-# NNSim
+# Neural Network Simulator (NNSim)

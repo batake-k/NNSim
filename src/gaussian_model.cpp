@@ -106,7 +106,6 @@ void GaussianModel::simulate() {
 }
 
 void GaussianModel::initNeurons() {
-  // TODO
   int N = std::sqrt(num_neurons);
   float value = 1.0 / N;
 
