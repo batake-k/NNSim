@@ -23,14 +23,14 @@ po::options_description DefineCalcOption() {
   opt.add_options()
     ("input_file,i", po::value<std::string>(), "problem file")
     ("output_file,o", po::value<std::string>(), "output file")
-    ("problem_type,p", po::value<int>(), "problem type (1, 2, 3)")
-    ("A,a", po::value<float>()->default_value(0), "Constraint A: for number of use")
-    ("B,b", po::value<float>()->default_value(0), "Constraint B: for overlap")
-    ("C,c", po::value<float>()->default_value(0), "Constraint C: for bubble")
-    ("D,d", po::value<float>()->default_value(0), "Constraint D: for piece connections")
-    ("E,e", po::value<float>()->default_value(0), "Constraint E: for wall connections")
-    ("F,f", po::value<float>()->default_value(0), "Constraint F: for minus weights")
-    ("G,g", po::value<float>()->default_value(0), "Constraint G: for size")
+    ("problem_type,p", po::value<int>(), "problem type (1:polyomino puzzle, 2:tiling problem, 3:extended tiling problem)")
+    ("A,a", po::value<float>()->default_value(0), "Constraint on the number of times each polyomino is used")
+    ("B,b", po::value<float>()->default_value(0), "Constraint on the overlap of the polyominoes on the board")
+    ("C,c", po::value<float>()->default_value(0), "Inhibition of bubbles")
+    ("D,d", po::value<float>()->default_value(0), "Encouragement for combination of polyominoes which contact each other")
+    ("E,e", po::value<float>()->default_value(0), "Encouragement for polyominoes which contact borders of the board")
+    ("F,f", po::value<float>()->default_value(0), "Broad restriction on all pairs of neurons")
+    ("G,g", po::value<float>()->default_value(0), "Restriction on the size of polyominoes")
     ("cut_bubble_size,s", po::value<int>(), "maximum bubble size")
     ("output_data,x", po::value<bool>()->default_value(false), "flag to output data file")
     ("output_data_detail,y", po::value<bool>()->default_value(false), "flag to output data detail file")
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
   } else {
     cout << "There are two sub-commands:" << endl
          << "calculate: calculate data for NNSim" << endl
-         << "generate:  generate puzzle" << endl;
+         << "generate:  generate puzzle randomly" << endl;
   }
 
   return 0;

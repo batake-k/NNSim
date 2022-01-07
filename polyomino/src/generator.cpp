@@ -187,7 +187,7 @@ void Generator::run() {
   vector<string> s_piece_sizes = split(parameter.piece_sizes, ',');
   cout << "num pieces: " << s_piece_sizes.size() << endl;
 
-  for (int i = 0; i < s_piece_sizes.size(); ++i) {
+  for (uint32_t i = 0; i < s_piece_sizes.size(); ++i) {
     vector<pair<int,int>> piece;
     vector<pair<int,int>> piece_sur;
     add(piece, piece_sur, base);

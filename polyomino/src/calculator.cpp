@@ -131,7 +131,6 @@ int calcConnectWall(const vector<pair<int,int>> &squares, const vector<pair<int,
   for (const auto &s : squares) {
     for (const auto &w : walls) {
       if ((s.first - w.first)*(w.first - s.first) + (s.second - w.second)*(w.second - s.second) >= -1) ++num;
-      //if ((w.first - s.first == 1 && w.second == s.second) || (w.second - s.second == 1 && w.first == s.first)) ++num;
     }
   }
   return num;
@@ -225,7 +224,7 @@ vector<BiasDetail> Calculator::calcBiasDetail() {
     int wall_edge = calcConnectWall(squares, surrounding_s);
 
     b_E = parameter.E * wall_edge;
-    a_E = parameter.E * wall_edge;
+    //a_E = parameter.E * wall_edge;
 
     b_G = - parameter.G / n.getSize();
     a_G = - parameter.G / n.getSize();
@@ -305,7 +304,7 @@ void Calculator::writeDataDetail() {
 void Calculator::writeData() {
   ofstream ofs(parameter.output_file + "_data", ios::binary);
   uint32_t neurons_size = neurons.size();
-/*
+
   {  // problem type
     int type = 4;
     ofs.write((char *)&type, sizeof(int));
@@ -348,7 +347,7 @@ void Calculator::writeData() {
       ofs.write((char *)&weights[0], sizeof(Weight) * size);
     }
   }
-*/
+
   {  // info board
     uint32_t size = board.size();
     ofs.write((char *)&size, sizeof(uint32_t));

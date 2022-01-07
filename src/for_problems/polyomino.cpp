@@ -96,5 +96,23 @@ string Polyomino::getGoalStatus(const vector<float> &outputs) {
   int score = getScore(outputs);
 	int piece_score = getPieceScore(outputs);
 
-	return "," + to_string(count) + "," + to_string(score) + "," + to_string(piece_score);
+	int count_3 = 0;
+	int count_4 = 0;
+	int count_5 = 0;
+	int count_6 = 0;
+
+	for (uint32_t i=0; i<=73; ++i){
+		if (outputs[i] >= 0.5) ++count_3;
+	}
+	for (uint32_t i=74; i<=192; ++i){
+		if (outputs[i] >= 0.5) ++count_4;
+	}
+	for (uint32_t i=193; i<=383; ++i){
+		if (outputs[i] >= 0.5) ++count_5;
+	}
+	for (uint32_t i=384; i<=692; ++i){
+		if (outputs[i] >= 0.5) ++count_6;
+	}
+
+	return "," + to_string(count) + "," + to_string(score) + "," + to_string(piece_score) + "," + to_string(count_3) + "," + to_string(count_4) + "," + to_string(count_5) + "," + to_string(count_6);
 }
