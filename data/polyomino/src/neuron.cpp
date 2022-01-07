@@ -22,8 +22,8 @@ int countWallEdge(const Neuron& i) {
   int count = 0;
   auto b = i.getBoard();
 
-  for (uint32_t x = 0; x < b.size(); ++x) {
-    for (uint32_t y = 0; y < b[0].size(); ++y) {
+  for (int x = 0; x < b.size(); ++x) {
+    for (int y = 0; y < b[0].size(); ++y) {
       if (b[x][y] != 1) {
         continue;
       }
