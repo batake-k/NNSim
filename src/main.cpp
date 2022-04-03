@@ -33,7 +33,7 @@ po::options_description DefineOption() {
     ("delta_t,d", po::value<float>()->default_value(1), "delta t");
 
   g_opt.add_options()
-    ("T_mf,m", po::value<float>()->default_value(0), "[sharpening] T_mf value at start")
+    ("T_mf,m", po::value<float>()->default_value(1), "[sharpening] T_mf value at start")
     ("time_constant_T_mf,M", po::value<uint32_t>(), "[sharpening] time constant T_mf. If not set, equal to generations")
     ("T_epsilon,e", po::value<float>()->default_value(0), "[annealing] T_epsilon value at start")
     ("time_constant_T_epsilon,E", po::value<uint32_t>(), "[annealing] time constant T_epsilon. If not set, equal to generations");
