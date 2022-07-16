@@ -16,10 +16,18 @@ using namespace std;
 void NeuralNetworkModelBinaryReader::open(const std::string& filepath) {
   utils::fileOpen(this->ifs, filepath, std::ios::in | std::ios::binary);
 }
+void NeuralNetworkModelTextReader::open(const std::string& filepath) {
+  utils::fileOpen(this->ifs, filepath, std::ios::in);
+}
 
 int NeuralNetworkModelBinaryReader::read_problem_type() {
   int problem_type;
   ifs.read((char*)&problem_type, sizeof(int));
+  return problem_type;
+}
+int NeuralNetworkModelTextReader::read_problem_type() {
+  int problem_type;
+  ifs >> problem_type;
   return problem_type;
 }
 std::vector<Bias> NeuralNetworkModelBinaryReader::read_biases() {
@@ -28,6 +36,16 @@ std::vector<Bias> NeuralNetworkModelBinaryReader::read_biases() {
   ifs.read((char*)&size, sizeof(uint32_t));
   biases.resize(size);
   ifs.read((char*)&biases[0], sizeof(Bias) * size);
+  return biases;
+}
+std::vector<Bias> NeuralNetworkModelTextReader::read_biases() {
+  uint32_t size;
+  std::vector<Bias> biases;
+  ifs >> size;
+  biases.resize(size);
+  for (uint32_t i = 0; i < size; ++i) {
+    ifs >> biases[i].before_bias >> biases[i].after_bias;
+  }
   return biases;
 }
 
@@ -44,19 +62,30 @@ std::vector<std::vector<Weight>> NeuralNetworkModelBinaryReader::read_weights() 
   }
   return weights;
 }
-
-Polyomino NeuralNetworkModelBinaryReader::read_polyomino() {
-  return Polyomino(ifs);
+std::vector<std::vector<Weight>> NeuralNetworkModelTextReader::read_weights() {
+  std::vector<std::vector<Weight>> weights;
+  uint32_t neuron_size, size;
+  ifs >> neuron_size;
+  weights.resize(neuron_size);
+  for (uint32_t i = 0; i < neuron_size; ++i) {
+    ifs >> size;
+    weights[i].resize(size);
+    for (uint32_t j = 0; j < size; ++j) {
+      ifs >> weights[i][j].before_weight >> weights[i][j].after_weight;
+    }
+  }
+  return weights;
 }
 
 
 NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
   NeuralNetworkModelReaderBase *reader;
-  // if (utils::isBinaryFile(parameters.input_path)) {
+  if (utils::isBinaryFile(parameters.input_path)) {
     reader = new NeuralNetworkModelBinaryReader();
-  // } else {
-  //   reader = new NeuralNetworkModelTextReader();
-  // }
+  } else {
+    std::cout << "NeuralNetworkModelTextReader" << std::endl;
+    reader = new NeuralNetworkModelTextReader();
+  }
   reader->open(parameters.input_path);
 
   this->problem_type = reader->read_problem_type();
@@ -72,7 +101,6 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
   this->weights = reader->read_weights();
   timer.elapsed("read weights file", 2);
 
-  this->polyomino = reader->read_polyomino();
   reader->close();
   delete reader;
 
@@ -129,7 +157,6 @@ void NeuralNetworkModel::writeData(const uint32_t generation) {
 
     binarization();
     ofs << calcEnergy(generation);
-    ofs << polyomino.getGoalStatus(outputs) << endl;
 
     ofs.close();
   }
