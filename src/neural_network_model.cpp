@@ -13,14 +13,26 @@
 
 using namespace std;
 
-void NeuralNetworkModel::readBiases(ifstream& ifs) {
+void NeuralNetworkModelBinaryReader::open(const std::string& filepath) {
+  utils::fileOpen(this->ifs, filepath, std::ios::in | std::ios::binary);
+}
+
+int NeuralNetworkModelBinaryReader::read_problem_type() {
+  int problem_type;
+  ifs.read((char*)&problem_type, sizeof(int));
+  return problem_type;
+}
+std::vector<Bias> NeuralNetworkModelBinaryReader::read_biases() {
   uint32_t size;
+  std::vector<Bias> biases;
   ifs.read((char*)&size, sizeof(uint32_t));
   biases.resize(size);
   ifs.read((char*)&biases[0], sizeof(Bias) * size);
+  return biases;
 }
 
-void NeuralNetworkModel::readWeights(ifstream& ifs) {
+std::vector<std::vector<Weight>> NeuralNetworkModelBinaryReader::read_weights() {
+  std::vector<std::vector<Weight>> weights;
   uint32_t neuron_size, size;
   ifs.read((char*)&neuron_size, sizeof(uint32_t));
   weights.resize(neuron_size);
@@ -30,28 +42,39 @@ void NeuralNetworkModel::readWeights(ifstream& ifs) {
     weights[i].resize(size);
     ifs.read((char*)&weights[i][0], sizeof(Weight) * size);
   }
+  return weights;
 }
 
-NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
-  ifstream ifs;
-  utils::fileOpen(ifs, parameters.input_path, ios::binary);
+Polyomino NeuralNetworkModelBinaryReader::read_polyomino() {
+  return Polyomino(ifs);
+}
 
-  ifs.read((char*)&problem_type, sizeof(int));
+
+NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
+  NeuralNetworkModelReaderBase *reader;
+  // if (utils::isBinaryFile(parameters.input_path)) {
+    reader = new NeuralNetworkModelBinaryReader();
+  // } else {
+  //   reader = new NeuralNetworkModelTextReader();
+  // }
+  reader->open(parameters.input_path);
+
+  this->problem_type = reader->read_problem_type();
   cout << "problem type: " << problem_type << endl;
 
   // read bias file, and init biases
   Timer timer;
-  readBiases(ifs);
+  this->biases = reader->read_biases();
   timer.elapsed("read biases file", 2);
 
   // read weights file, and init weights
   timer.restart();
-  readWeights(ifs);
+  this->weights = reader->read_weights();
   timer.elapsed("read weights file", 2);
 
-  polyomino = Polyomino(ifs);
-
-  ifs.close();
+  this->polyomino = reader->read_polyomino();
+  reader->close();
+  delete reader;
 
 #ifdef GUI
   #if defined __linux__ || defined __APPLE__
