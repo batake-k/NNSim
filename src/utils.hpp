@@ -14,6 +14,7 @@ namespace utils {
 
 double getMaxMemoryConsumption();
 std::vector<std::string> split(const std::string& str, const char delim);
+bool isBinaryFile(const std::string& filepath); // check if file is binary
 
 template <typename T>
 void fileOpen(T& fs, const std::string& filepath, const std::ios_base::openmode mode) {

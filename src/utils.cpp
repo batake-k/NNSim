@@ -39,6 +39,20 @@ std::vector<std::string> split(const std::string &str, const char delim) {
   return elems;
 }
 
+bool isBinaryFile(const std::string& filepath) {
+  std::ifstream ifs;
+  utils::fileOpen(ifs, filepath, std::ios::in | std::ios::binary);
+
+  while(ifs.peek() != EOF) {
+    char c = ifs.get();
+    if (c <= 0x08 || c >= 0x0E) {
+      // Out of ASCII range
+      return true;
+    }
+  }
+  return false;
+}
+
 /*void WriteString(ofstream &ofs, const string &s){
         int size = s.size()+1;
         const char *s_char = s.c_str();
