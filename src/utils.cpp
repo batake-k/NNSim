@@ -45,7 +45,6 @@ bool isBinaryFile(const std::string& filepath) {
 
   while(ifs.peek() != EOF) {
     char c = ifs.get();
-    std::cout << c << std::endl;
     if (c <= 0x08) {
       // Out of ASCII range
       return true;

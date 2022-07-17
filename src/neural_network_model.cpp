@@ -95,11 +95,13 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
   Timer timer;
   this->biases = reader->read_biases();
   timer.elapsed("read biases file", 2);
+  cout << "biases size: " << biases.size() << endl;
 
   // read weights file, and init weights
   timer.restart();
   this->weights = reader->read_weights();
   timer.elapsed("read weights file", 2);
+  cout << "weights size: " << weights.size() << " " << weights[0].size() << endl;
 
   reader->close();
   delete reader;
