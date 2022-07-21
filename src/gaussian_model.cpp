@@ -109,7 +109,7 @@ void GaussianModel::initNeurons() {
   int N = num_neurons; 
   float value = 1.0 / N;
 
-  uniform_real_distribution<> rand_real(0, 2 * value);
+  uniform_real_distribution<> rand_real(0, std::min(2 * value, 1.0f));
 
   for (uint32_t i = 0; i < num_neurons; ++i) {
     outputs[i] = rand_real(mt[0]);
