@@ -106,7 +106,7 @@ void GaussianModel::simulate() {
 }
 
 void GaussianModel::initNeurons() {
-  int N = std::sqrt(num_neurons);
+  int N = num_neurons; 
   float value = 1.0 / N;
 
   uniform_real_distribution<> rand_real(0, 2 * value);
