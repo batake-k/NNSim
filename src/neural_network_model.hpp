@@ -20,6 +20,7 @@ typedef struct {
 
 class NeuralNetworkModel {
 public:
+  uint32_t generation;
 
   typedef struct {
     std::string input_path;
@@ -45,6 +46,7 @@ protected:
   void writePotentials(std::ofstream& ofs);
 
   double calcEnergy(const uint32_t generation);
+  void step();
 
   std::vector<float> potentials;
   std::vector<float> outputs;
@@ -60,9 +62,11 @@ protected:
   float reciprocal_time_constant;
 
 private:
-  virtual void initNeurons(){};
-  virtual float func(const float input) { return 0; };
-  virtual float inverseFunc(const float input) { return 0; };
+  virtual void initNeurons() = 0;
+  virtual float func(const float input) = 0;
+  virtual float inverseFunc(const float input) = 0;
+  virtual void stepSync() = 0;
+  virtual void stepAsync() = 0;
 
   void readWeights(std::ifstream& ifs);
   void readBiases(std::ifstream& ifs);

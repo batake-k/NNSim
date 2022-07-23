@@ -23,82 +23,14 @@ void GaussianModel::simulate() {
   writeData(0);
   Timer timer;
 
-  if (parameters.synchronize) {
 
-#ifdef _OPENMP
-    omp_set_num_threads(parameters.threads);
-#endif
-
-    #pragma omp parallel
-    for (uint32_t generation = 0; generation < parameters.generations; ++generation) {
-      int id = omp_get_thread_num();
-
-      #pragma omp single
-      {
-        timer.restart();
-        calculateT_mf(generation);
-        calculateT_epsilon(generation);
-      }
-
-      std::normal_distribution<> dist =
-          std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
-
-      #pragma omp for
-      for (uint32_t i = 0; i < num_neurons; ++i) {
-        float input_sum = 0;
-
-        for (const auto& w : weights[i]) {
-          float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
-          input_sum += outputs_old[w.neuron_id] * weight;
-        }
-
-        float bias = biases[i].before_bias
-                     + (biases[i].after_bias - biases[i].before_bias) * generation / parameters.generations;
-        potentials[i] +=
-            parameters.delta_t * (-reciprocal_time_constant * potentials[i] + input_sum + bias + dist(mt[id]));
-        outputs[i] = func(potentials[i]);
-      }
-
-      #pragma omp for
-      for (uint32_t i = 0; i < num_neurons; ++i) {
-        outputs_old[i] = outputs[i];
-      }
-
-      #pragma omp single
-      {
-        timer.elapsed("update", 2);
-        writeData(generation + 1);
-      }
-    }
-
-  } else {
-
-    for (uint32_t generation = 0; generation < parameters.generations; ++generation) {
-      timer.restart();
-      calculateT_mf(generation);
-      calculateT_epsilon(generation);
-      std::normal_distribution<> dist =
-          std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
-
-      for (uint32_t i = 0; i < num_neurons; ++i) {
-        uint32_t id = rand_int(mt[0]);
-        float input_sum = 0;
-
-        for (const auto& w : weights[id]) {
-          float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
-          input_sum += outputs[w.neuron_id] * weight;
-        }
-
-        float bias = biases[id].before_bias +
-                     (biases[id].after_bias - biases[id].before_bias) * generation / parameters.generations;
-        potentials[id] +=
-            parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + bias + dist(mt[0]));
-        outputs[id] = func(potentials[id]);
-      }
-
-      timer.elapsed("update", 2);
-      writeData(generation + 1);
-    }
+  for (this->generation = 0; this->generation < parameters.generations; ++(this->generation)) {
+    timer.restart();
+    calculateT_mf(generation);
+    calculateT_epsilon(generation);
+    this->step();
+    timer.elapsed("update", 2);
+    writeData(generation + 1);
   }
 }
 
@@ -149,6 +81,53 @@ float GaussianModel::func(const float input) {
   return 1.0 / (1.0 + exp(-input * sharpening_parameters.reciprocal_current_T_mf));
 }
 
+void GaussianModel::stepSync() {
+  int id = omp_get_thread_num();
+  std::normal_distribution<> dist =
+    std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
+
+  #pragma omp parallel for
+  for (uint32_t i = 0; i < num_neurons; ++i) {
+    float input_sum = 0;
+
+    for (const auto& w : weights[i]) {
+      float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
+      input_sum += outputs_old[w.neuron_id] * weight;
+    }
+
+    float bias = biases[i].before_bias
+                  + (biases[i].after_bias - biases[i].before_bias) * generation / parameters.generations;
+    potentials[i] +=
+        parameters.delta_t * (-reciprocal_time_constant * potentials[i] + input_sum + bias + dist(mt[id]));
+    outputs[i] = func(potentials[i]);
+  }
+
+  #pragma omp parallel for
+  for (uint32_t i = 0; i < num_neurons; ++i) {
+    outputs_old[i] = outputs[i];
+  }
+
+}
+
+void GaussianModel::stepAsync() {
+  std::normal_distribution<> dist =
+    std::normal_distribution<>(0.0, std::sqrt(2 * annealing_parameters.current_T_epsilon));
+  for (uint32_t i = 0; i < num_neurons; ++i) {
+    uint32_t id = rand_int(mt[0]);
+    float input_sum = 0;
+
+    for (const auto& w : weights[id]) {
+      float weight = w.before_weight + (w.after_weight - w.before_weight) * generation / parameters.generations;
+      input_sum += outputs[w.neuron_id] * weight;
+    }
+
+    float bias = biases[id].before_bias +
+                  (biases[id].after_bias - biases[id].before_bias) * generation / parameters.generations;
+    potentials[id] +=
+        parameters.delta_t * (-reciprocal_time_constant * potentials[id] + input_sum + bias + dist(mt[0]));
+    outputs[id] = func(potentials[id]);
+  }
+}
 void GaussianModel::calcFreeEnergy(const uint32_t generation) {
   double E = calcEnergy(generation);
 

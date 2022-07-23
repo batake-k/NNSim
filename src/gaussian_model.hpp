@@ -33,6 +33,8 @@ private:
 
   float func(const float input);
   float inverseFunc(const float input);
+  void stepSync();
+  void stepAsync();
 
   SharpeningParameters sharpening_parameters;
   AnnealingParameters annealing_parameters;

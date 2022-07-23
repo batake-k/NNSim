@@ -206,6 +206,14 @@ void NeuralNetworkModel::binarization() {
   }
 }
 
+void NeuralNetworkModel::step() {
+  if (this->parameters.synchronize) {
+    this->stepSync();
+  } else {
+    this->stepAsync();
+  }
+}
+
 double NeuralNetworkModel::calcEnergy(const uint32_t generation) {
   double E = 0;
 
