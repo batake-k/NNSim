@@ -1,18 +1,10 @@
-MODE:=Experiment
-#Experiment or GUI
 
 PROGRAM=
 
 CXX=g++
 CXX_FLAGS=-Wall -std=c++11 -O3 -fopenmp
 
-ifeq ($(MODE),Experiment)
-	CXX_FLAGS += -DEXP
-	PROGRAM=nnsim
-else ifeq ($(MODE),GUI)
-	CXX_FLAGS += -DGUI
-	PROGRAM=nnsim-gui
-endif
+PROGRAM=nnsim
 
 #C_SRC= \
 
@@ -32,11 +24,13 @@ all:dir $(PROGRAM)
 
 $(PROGRAM): $(OBJS)
 	$(CXX) $(CXX_FLAGS) -o $@ $(OBJS) -lboost_program_options
+objs/%.o: src/%.cpp src/%.hpp
+	$(CXX) $(CXX_FLAGS) -c $< -o $@
 objs/%.o: src/%.cpp
 	$(CXX) $(CXX_FLAGS) -c $< -o $@
 
 dir:
-	mkdir objs objs/for_problems
+	mkdir -p objs objs/for_problems
 
 .PHONY: clean
 clean:

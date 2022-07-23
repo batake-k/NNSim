@@ -24,7 +24,7 @@ po::options_description DefineOption() {
 
   req_opt.add_options()
     ("input,i", po::value<std::string>(), "input data file")
-    ("output,o", po::value<std::string>(), "output file(EXP) or folder(GUI)");
+    ("output,o", po::value<std::string>(), "output file");
 
   n_opt.add_options()
     ("network_model,n", po::value<char>()->default_value('g'), "network model, h(hopfield) or g(gaussian)")

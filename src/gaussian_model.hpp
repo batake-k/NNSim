@@ -29,7 +29,7 @@ private:
   void initNeurons();
   void calculateT_mf(const uint32_t generation);
   void calculateT_epsilon(const uint32_t generation);
-  void calcFreeEnergy(const uint32_t generation);
+  double calcFreeEnergy(const uint32_t generation);
 
   float func(const float input);
   float inverseFunc(const float input);

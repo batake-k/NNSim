@@ -128,7 +128,7 @@ void GaussianModel::stepAsync() {
     outputs[id] = func(potentials[id]);
   }
 }
-void GaussianModel::calcFreeEnergy(const uint32_t generation) {
+double GaussianModel::calcFreeEnergy(const uint32_t generation) {
   double E = calcEnergy(generation);
 
   double S = 0;
@@ -143,5 +143,5 @@ void GaussianModel::calcFreeEnergy(const uint32_t generation) {
   }
 
   double F = E - sharpening_parameters.current_T_mf * S;
-  cout << "F: " << F << endl;
+  return F;
 }
