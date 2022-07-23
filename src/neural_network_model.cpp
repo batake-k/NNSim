@@ -11,7 +11,29 @@
   #include <direct.h>
 #endif
 
+namespace {
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& v){
+  os << "[";
+  for (const auto &e : v) {
+    os << e << ", ";
+  }
+  os << "]";
+  return os;
+}
+} // anonymous namespace
+
 using namespace std;
+
+std::ostream& operator<<(std::ostream& os, const Bias& bias) {
+  os << bias.before_bias << "->" << bias.after_bias;
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Weight& weight) {
+  os << weight.neuron_id << ":" << weight.before_weight << "->" << weight.after_weight;
+  return os;
+}
 
 void NeuralNetworkModelBinaryReader::open(const std::string& filepath) {
   utils::fileOpen(this->ifs, filepath, std::ios::in | std::ios::binary);
@@ -71,7 +93,7 @@ std::vector<std::vector<Weight>> NeuralNetworkModelTextReader::read_weights() {
     ifs >> size;
     weights[i].resize(size);
     for (uint32_t j = 0; j < size; ++j) {
-      ifs >> weights[i][j].before_weight >> weights[i][j].after_weight;
+      ifs >> weights[i][j].neuron_id >> weights[i][j].before_weight >> weights[i][j].after_weight;
     }
   }
   return weights;
@@ -95,13 +117,15 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
   Timer timer;
   this->biases = reader->read_biases();
   timer.elapsed("read biases file", 2);
-  cout << "biases size: " << biases.size() << endl;
+  cout << "biases size: " << biases.size() << endl
+    << biases << endl;
 
   // read weights file, and init weights
   timer.restart();
   this->weights = reader->read_weights();
   timer.elapsed("read weights file", 2);
-  cout << "weights size: " << weights.size() << " " << weights[0].size() << endl;
+  cout << "weights size: " << weights.size() << " " << weights[0].size() << endl
+    << weights << endl;
 
   reader->close();
   delete reader;
@@ -125,15 +149,15 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
 }
 
 void NeuralNetworkModel::writeData(const uint32_t generation) {
-  if (generation == parameters.generations) {
-    ofstream ofs;
-    utils::fileOpen(ofs, parameters.output_path, ios::out | ios::app);
+  ofstream ofs;
+  utils::fileOpen(ofs, parameters.output_path, ios::out | ios::app);
+  ofs << calcEnergy(generation) << ", ";
 
-    binarization();
-    ofs << calcEnergy(generation);
-
-    ofs.close();
+  for (auto &output : outputs) {
+    ofs << output << ", ";
   }
+  ofs << endl;
+  ofs.close();
 }
 
 void NeuralNetworkModel::writeOutputs(ofstream& ofs) {

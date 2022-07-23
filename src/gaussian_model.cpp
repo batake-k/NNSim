@@ -1,6 +1,7 @@
 #include "gaussian_model.hpp"
 
 #include "timer.hpp"
+#include "utils.hpp"
 
 #include <cmath>
 #include <iostream>

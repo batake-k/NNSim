@@ -7,16 +7,20 @@
 #include <vector>
 
 
-typedef struct {
+class Bias {
+public:
   float before_bias;
   float after_bias;
-} Bias;
+  friend std::ostream& operator<<(std::ostream& os, const Bias& bias);
+};
 
-typedef struct {
+class Weight {
+public:
   uint32_t neuron_id;
   float before_weight;
   float after_weight;
-} Weight;
+  friend std::ostream& operator<<(std::ostream& os, const Weight& weight);
+};
 
 class NeuralNetworkModel {
 public:
