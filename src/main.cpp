@@ -6,6 +6,10 @@
 #include "utils.hpp"
 #include "simulator.hpp"
 
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
+
 using namespace std;
 
 namespace po = boost::program_options;
@@ -67,6 +71,10 @@ int main(int argc, char *argv[]) {
     exit(0);
   }
 
+// openmp setting
+#ifdef _OPENMP
+  omp_set_num_threads(vm["threads"].as<uint32_t>());
+#endif
   Simulator simulator;
   simulator.run(vm);
 
