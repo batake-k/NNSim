@@ -1,4 +1,7 @@
 {
     "name": "NNSim",
     "dockerFile": "Dockerfile",
+    "extensions": [
+	"github.copilot",
+    ]
 }
