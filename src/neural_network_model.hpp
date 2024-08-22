@@ -6,19 +6,10 @@
 #include <string>
 #include <vector>
 
+#include "neural_network_model_reader_base.hpp"
 #include "for_problems/polyomino.hpp"
 
 
-typedef struct {
-  float before_bias;
-  float after_bias;
-} Bias;
-
-typedef struct {
-  uint32_t neuron_id;
-  float before_weight;
-  float after_weight;
-} Weight;
 
 class NeuralNetworkModel {
 public:
@@ -76,37 +67,6 @@ private:
 };
 
 
-class NeuralNetworkModelReaderBase {
-public:
-  virtual void open(const std::string& input_path) = 0;
-  virtual void close() { this->ifs.close(); };
-  virtual int read_problem_type() = 0;
-  virtual std::vector<Bias> read_biases() = 0;
-  virtual std::vector<std::vector<Weight>> read_weights() = 0;
-  virtual Polyomino read_polyomino() = 0;
-  ~NeuralNetworkModelReaderBase() { this->close(); };
-protected:
-  std::ifstream ifs;
-};
 
-class NeuralNetworkModelBinaryReader : public NeuralNetworkModelReaderBase {
-public:
-  NeuralNetworkModelBinaryReader() {};
-  void open(const std::string& input_path);
-  int read_problem_type();
-  std::vector<Bias> read_biases();
-  std::vector<std::vector<Weight>> read_weights();
-  Polyomino read_polyomino();
-};
-
-// class NeuralNetworkModelTextReader : public NeuralNetworkModelReaderBase {
-// public:
-//   NeuralNetworkModelTextReader() {};
-//   void open(const std::string& input_path);
-//   int read_problem_type();
-//   std::vector<Bias> read_biases();
-//   std::vector<std::vector<Weight>> read_weights();
-//   Polyomino read_polyomino();
-// };
 
 #endif
