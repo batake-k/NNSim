@@ -115,6 +115,7 @@ void NeuralNetworkModel::writeData(const uint32_t generation) {
   ofstream ofs;
   if (generation == 0) {
     utils::fileOpen(ofs, parameters.output_path, ios::out);
+    ofs << to_string(parameters.generations) << endl << endl;
   } else {
     utils::fileOpen(ofs, parameters.output_path, ios::out | ios::app);
   }
