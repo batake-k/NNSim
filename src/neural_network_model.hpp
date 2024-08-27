@@ -71,7 +71,7 @@ private:
   void binarization();
 
   int problem_type;
-  Polyomino polyomino;
+  // Polyomino polyomino;
 };
 
 #endif

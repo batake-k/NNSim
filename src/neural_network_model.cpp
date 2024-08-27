@@ -49,24 +49,24 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
   readWeights(ifs);
   timer.elapsed("read weights file", 2);
 
-  polyomino = Polyomino(ifs);
+  // polyomino = Polyomino(ifs);
 
   ifs.close();
 
-#ifdef GUI
-  #if defined __linux__ || defined __APPLE__
-    if (mkdir(parameters.output_path.c_str(), 0755) != 0) {
-      cerr << "[ERROR] failed to create directory" << endl;
-      exit(0);
-    }
-  #elif _WIN32
-    if (_makedir(parameters.output_path) != 0) {
-      cerr << "[ERROR] failed to create directory" << endl;
-      exit(0);
-    }
-  #else
-  #endif
-#endif
+// #ifdef GUI
+//   #if defined __linux__ || defined __APPLE__
+//     if (mkdir(parameters.output_path.c_str(), 0755) != 0) {
+//       cerr << "[ERROR] failed to create directory" << endl;
+//       exit(0);
+//     }
+//   #elif _WIN32
+//     if (_makedir(parameters.output_path) != 0) {
+//       cerr << "[ERROR] failed to create directory" << endl;
+//       exit(0);
+//     }
+//   #else
+//   #endif
+// #endif
 
   num_neurons = biases.size();
 
@@ -87,8 +87,31 @@ NeuralNetworkModel::NeuralNetworkModel(const Parameters& p) : parameters(p) {
 }
 
 void NeuralNetworkModel::writeData(const uint32_t generation) {
-#ifdef GUI
+// #ifdef GUI
 
+//   ofstream ofs;
+//   utils::fileOpen(ofs, parameters.output_path + "/" + to_string(generation), ios::out);
+//   ofs << calcEnergy(generation) << endl << endl;
+
+//   writeOutputs(ofs);
+//   writePotentials(ofs);
+
+//   ofs.close();
+
+// #elif defined(EXP)
+
+//   if (generation == parameters.generations) {
+//     ofstream ofs;
+//     utils::fileOpen(ofs, parameters.output_path, ios::out | ios::app);
+
+//     binarization();
+//     ofs << calcEnergy(generation);
+//     ofs << polyomino.getGoalStatus(outputs) << endl;
+
+//     ofs.close();
+//   }
+
+// #endif
   ofstream ofs;
   utils::fileOpen(ofs, parameters.output_path + "/" + to_string(generation), ios::out);
   ofs << calcEnergy(generation) << endl << endl;
@@ -97,21 +120,6 @@ void NeuralNetworkModel::writeData(const uint32_t generation) {
   writePotentials(ofs);
 
   ofs.close();
-
-#elif defined(EXP)
-
-  if (generation == parameters.generations) {
-    ofstream ofs;
-    utils::fileOpen(ofs, parameters.output_path, ios::out | ios::app);
-
-    binarization();
-    ofs << calcEnergy(generation);
-    ofs << polyomino.getGoalStatus(outputs) << endl;
-
-    ofs.close();
-  }
-
-#endif
 }
 
 void NeuralNetworkModel::writeOutputs(ofstream& ofs) {
